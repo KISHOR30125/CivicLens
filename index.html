@@ -1,0 +1,3603 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CivicLens // AI Municipal Intelligence & Civic Operations Platform</title>
+  <meta name="description" content="Next-Gen AI Triage and Civic Operations Platform for Citizen Complaints. Multimodal AI, Geospatial Telemetry, Duplicate Clustering, and Department Intelligence." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            civic: {
+              void: '#03060D',
+              obsidian: '#060B16',
+              surface: '#0A1224',
+              card: '#0F1A34',
+              cardHover: '#142244',
+              border: 'rgba(255, 255, 255, 0.08)',
+              borderGlow: 'rgba(6, 182, 212, 0.3)',
+              cyan: '#06B6D4',
+              cyanGlow: '#22D3EE',
+              electric: '#00F2FE',
+              violet: '#8B5CF6',
+              neonViolet: '#A855F7',
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              crimson: '#EF4444',
+              laserRed: '#FF0055',
+              blue: '#3B82F6',
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 28px -4px rgba(6, 182, 212, 0.55)',
+            'glow-cyan-sm': '0 0 14px -2px rgba(6, 182, 212, 0.45)',
+            'glow-violet': '0 0 28px -4px rgba(139, 92, 246, 0.55)',
+            'glow-crimson': '0 0 35px -3px rgba(239, 68, 68, 0.65)',
+            'glow-laser': '0 0 40px -2px rgba(255, 0, 85, 0.75)',
+            'glow-emerald': '0 0 28px -4px rgba(16, 185, 129, 0.55)',
+            'glow-amber': '0 0 28px -4px rgba(245, 158, 11, 0.55)',
+            'glass': '0 12px 40px 0 rgba(0, 0, 0, 0.55)',
+            'inner-glow': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.12)',
+          },
+          animation: {
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'pulse-slow': 'pulse 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'scanline': 'scanline 2.2s linear infinite',
+            'shimmer': 'shimmer 2.2s infinite linear',
+            'radar-sweep': 'radarSweep 6s linear infinite',
+            'beacon': 'beacon 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite',
+            'float': 'float 4s ease-in-out infinite',
+            'fadeIn': 'fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            scanline: {
+              '0%': { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(1000%)' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' }
+            },
+            radarSweep: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' }
+            },
+            beacon: {
+              '0%': { transform: 'scale(1)', opacity: '1' },
+              '100%': { transform: 'scale(2.4)', opacity: '0' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(8px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- React 18 & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for direct in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Recharts UMD & PropTypes -->
+  <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+
+  <style>
+    /* Custom High-Tech Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 18, 36, 0.7);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.7);
+    }
+
+    /* Ambient Cyber Background Grid */
+    .bg-grid-cyber {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    }
+
+    /* Glassmorphic Panels with Subtle Gradient Borders */
+    .glass-card {
+      background: rgba(13, 22, 44, 0.76);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 35px 0 rgba(0, 0, 0, 0.45);
+    }
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      background: rgba(16, 28, 56, 0.88);
+      border-color: rgba(6, 182, 212, 0.45);
+      box-shadow: 0 16px 35px -8px rgba(6, 182, 212, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Leaflet Dark Theme & Custom Glow Overrides */
+    .leaflet-container {
+      background: #050811 !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(10, 18, 36, 0.96) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(6, 182, 212, 0.45) !important;
+      color: #f1f5f9 !important;
+      border-radius: 14px !important;
+      box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.85) !important;
+      padding: 0 !important;
+    }
+    .leaflet-popup-tip {
+      background: rgba(10, 18, 36, 0.96) !important;
+    }
+
+    /* Radar Sonar Wave for Critical Incident Markers */
+    .pin-sonar-critical {
+      position: relative;
+    }
+    .pin-sonar-critical::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.35);
+      animation: pinBeaconRed 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      pointer-events: none;
+    }
+    .pin-sonar-critical::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 0, 85, 0.6);
+      animation: pinBeaconRed 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite 0.5s;
+      pointer-events: none;
+    }
+    @keyframes pinBeaconRed {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .pin-sonar-amber::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.25);
+      animation: pinBeaconRed 2.2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      pointer-events: none;
+    }
+
+    /* Gradient Typography Utilities */
+    .gradient-text-cyan {
+      background: linear-gradient(135deg, #A5F3FC 0%, #22D3EE 40%, #06B6D4 70%, #3B82F6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-text-violet {
+      background: linear-gradient(135deg, #E9D5FF 0%, #C084FC 40%, #8B5CF6 70%, #6366F1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-text-crimson {
+      background: linear-gradient(135deg, #FECDD3 0%, #FB7185 40%, #EF4444 80%, #991B1B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-[#03060D] text-slate-100 antialiased font-sans selection:bg-cyan-500 selection:text-black overflow-x-hidden min-h-screen relative">
+  
+  <!-- Ambient Interactive Canvas Particles Background -->
+  <canvas id="ambient-cyber-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+  <div id="root" class="relative z-10"></div>
+
+  <!-- Main Application Script -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo } = React;
+
+    const {
+      ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
+      BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
+      AreaChart, Area
+    } = window.Recharts || {};
+
+    // ========================================================
+    // 1. SOUND SYNTHESIS ENGINE (Zero external dependencies)
+    // ========================================================
+    const playHapticAudio = (type = 'click') => {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const now = ctx.currentTime;
+
+        if (type === 'click') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(850, now);
+          osc.frequency.exponentialRampToValueAtTime(320, now + 0.04);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'success') {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            gain.gain.setValueAtTime(0.04, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.22);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.22);
+          });
+        } else if (type === 'alert') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.setValueAtTime(980, now + 0.1);
+          osc.frequency.setValueAtTime(520, now + 0.2);
+          gain.gain.setValueAtTime(0.07, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'scan') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(1500, now + 0.22);
+          gain.gain.setValueAtTime(0.035, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        }
+      } catch (err) {}
+    };
+
+    // ========================================================
+    // 2. OFFLINE ULTRA-RELIABLE SVG ICONS
+    // ========================================================
+    const Icon = ({ name, size = 18, className = "" }) => {
+      const icons = {
+        activity: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
+        shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+        alert: (
+          <g>
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </g>
+        ),
+        check: <polyline points="20 6 9 17 4 12" />,
+        clock: (
+          <g>
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </g>
+        ),
+        mapPin: (
+          <g>
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </g>
+        ),
+        layers: (
+          <g>
+            <polygon points="12 2 2 7 12 12 22 7 12 2" />
+            <polyline points="2 17 12 22 22 17" />
+            <polyline points="2 12 12 17 22 12" />
+          </g>
+        ),
+        search: (
+          <g>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </g>
+        ),
+        filter: <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />,
+        sparkles: (
+          <g>
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          </g>
+        ),
+        cpu: (
+          <g>
+            <rect x="4" y="4" width="16" height="16" rx="2" />
+            <rect x="9" y="9" width="6" height="6" />
+            <path d="M15 2v2M9 2v2M15 20v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2" />
+          </g>
+        ),
+        bell: (
+          <g>
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+          </g>
+        ),
+        zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+        droplet: <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />,
+        trash: (
+          <g>
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </g>
+        ),
+        road: (
+          <g>
+            <rect x="4" y="2" width="16" height="20" rx="2" />
+            <line x1="12" y1="4" x2="12" y2="8" strokeDasharray="2 2" />
+            <line x1="12" y1="12" x2="12" y2="16" strokeDasharray="2 2" />
+            <line x1="12" y1="18" x2="12" y2="20" strokeDasharray="2 2" />
+          </g>
+        ),
+        tree: (
+          <g>
+            <path d="M12 2L4 12h4l-3 7h14l-3-7h4L12 2z" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+          </g>
+        ),
+        bot: (
+          <g>
+            <rect x="3" y="11" width="18" height="10" rx="2" />
+            <circle cx="12" cy="5" r="2" />
+            <path d="M12 7v4" />
+            <line x1="8" y1="16" x2="8" y2="16" />
+            <line x1="16" y1="16" x2="16" y2="16" />
+          </g>
+        ),
+        send: (
+          <g>
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </g>
+        ),
+        plus: <path d="M5 12h14m-7-7v14" />,
+        x: <path d="M18 6 6 18M6 6l12 12" />,
+        eye: (
+          <g>
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+            <circle cx="12" cy="12" r="3" />
+          </g>
+        ),
+        copy: (
+          <g>
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </g>
+        ),
+        upload: (
+          <g>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </g>
+        ),
+        chevronRight: <polyline points="9 18 15 12 9 6" />,
+        chevronDown: <polyline points="6 9 12 15 18 9" />,
+        refresh: (
+          <g>
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+          </g>
+        ),
+        speaker: (
+          <g>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08" />
+          </g>
+        ),
+        mute: (
+          <g>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </g>
+        ),
+        users: (
+          <g>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </g>
+        ),
+        globe: (
+          <g>
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </g>
+        ),
+        trendingUp: (
+          <g>
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            <polyline points="17 6 23 6 23 12" />
+          </g>
+        ),
+        camera: (
+          <g>
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
+          </g>
+        ),
+        star: <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />,
+        download: (
+          <g>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </g>
+        ),
+        tool: (
+          <g>
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          </g>
+        ),
+        kanban: (
+          <g>
+            <rect x="3" y="3" width="5" height="18" rx="1" />
+            <rect x="10" y="3" width="5" height="12" rx="1" />
+            <rect x="17" y="3" width="5" height="15" rx="1" />
+          </g>
+        ),
+        table: (
+          <g>
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M3 15h18M9 3v18" />
+          </g>
+        ),
+        menu: (
+          <g>
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </g>
+        )
+      };
+
+      return (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          {icons[name] || icons.activity}
+        </svg>
+      );
+    };
+
+    // ========================================================
+    // 3. ANIMATED NUMBER COUNTER (Cinematic Smooth Entrance)
+    // ========================================================
+    const AnimatedCounter = ({ target, duration = 1200, prefix = "", suffix = "" }) => {
+      const [count, setCount] = useState(0);
+
+      useEffect(() => {
+        let startTime = null;
+        let animationFrameId;
+
+        const animate = (timestamp) => {
+          if (!startTime) startTime = timestamp;
+          const progress = Math.min((timestamp - startTime) / duration, 1);
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          setCount(Math.floor(easedProgress * target));
+
+          if (progress < 1) {
+            animationFrameId = requestAnimationFrame(animate);
+          } else {
+            setCount(target);
+          }
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(animationFrameId);
+      }, [target, duration]);
+
+      return <span>{prefix}{count.toLocaleString()}{suffix}</span>;
+    };
+
+    // ========================================================
+    // 4. REAL-TIME SLA COUNTDOWN TIMER COMPONENT
+    // ========================================================
+    const SlaCountdownTimer = ({ initialHours = 2 }) => {
+      const [secondsLeft, setSecondsLeft] = useState(initialHours * 3600 - 1240);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setSecondsLeft(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      const hrs = Math.floor(secondsLeft / 3600);
+      const mins = Math.floor((secondsLeft % 3600) / 60);
+      const secs = secondsLeft % 60;
+
+      const format = (n) => String(n).padStart(2, '0');
+
+      return (
+        <span className="font-mono font-bold tracking-widest text-rose-300">
+          {format(hrs)}h : {format(mins)}m : {format(secs)}s
+        </span>
+      );
+    };
+
+    // ========================================================
+    // 5. MASTER CIVIC TAXONOMY & DEPARTMENT BENCHMARKS
+    // ========================================================
+    const CATEGORIES = [
+      { id: 'roads', name: 'Roads & Bridges', icon: 'road', color: 'cyan', dept: 'Public Works Department (PWD)' },
+      { id: 'waste', name: 'Solid Waste & Sanitation', icon: 'trash', color: 'emerald', dept: 'Solid Waste Management (SWM)' },
+      { id: 'water', name: 'Water Supply & Treatment', icon: 'droplet', color: 'blue', dept: 'Water Supply & Sewerage Board' },
+      { id: 'electricity', name: 'Electricity & Lighting', icon: 'zap', color: 'amber', dept: 'Power Distribution Corp (DISCOM)' },
+      { id: 'drainage', name: 'Drainage & Stormwater', icon: 'activity', color: 'violet', dept: 'Stormwater Drain Division' },
+      { id: 'trees', name: 'Trees & Urban Forestry', icon: 'tree', color: 'emerald', dept: 'Forest & Horticulture Cell' },
+      { id: 'safety', name: 'Public Safety & Hazards', icon: 'shield', color: 'crimson', dept: 'Municipal Disaster & Safety Bureau' },
+    ];
+
+    const SEVERITY_CONFIG = {
+      Critical: {
+        badge: 'bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-glow-crimson',
+        glow: 'shadow-glow-crimson',
+        pinClass: 'pin-sonar-critical',
+        markerBg: '#EF4444',
+        slaHours: 2,
+        label: 'Critical Emergency (SLA: 2h)',
+      },
+      High: {
+        badge: 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-glow-amber',
+        glow: 'shadow-glow-amber',
+        pinClass: 'pin-sonar-amber',
+        markerBg: '#F59E0B',
+        slaHours: 12,
+        label: 'High Priority (SLA: 12h)',
+      },
+      Medium: {
+        badge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-glow-cyan-sm',
+        glow: 'shadow-glow-cyan',
+        pinClass: '',
+        markerBg: '#06B6D4',
+        slaHours: 36,
+        label: 'Medium Priority (SLA: 36h)',
+      },
+      Low: {
+        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-glow-emerald',
+        glow: 'shadow-glow-emerald',
+        pinClass: '',
+        markerBg: '#10B981',
+        slaHours: 72,
+        label: 'Standard Priority (SLA: 72h)',
+      }
+    };
+
+    const DEPARTMENT_METRICS = [
+      { id: 'pwd', name: 'Public Works Department (PWD)', code: 'PWD', totalTickets: 28, activeBacklog: 14, slaCompliance: 78.4, avgResolutionHours: 18.2, grade: 'B', bottleneckRisk: 'High - Monsoon Asphalt Delamination Backlog' },
+      { id: 'discom', name: 'Power Distribution Corp (DISCOM)', code: 'DISCOM', totalTickets: 22, activeBacklog: 8, slaCompliance: 92.1, avgResolutionHours: 2.8, grade: 'A', bottleneckRisk: 'Medium - High Voltage Feeder Overloads' },
+      { id: 'swd', name: 'Stormwater Drain Division (SWD)', code: 'SWD', totalTickets: 19, activeBacklog: 11, slaCompliance: 74.0, avgResolutionHours: 14.5, grade: 'C+', bottleneckRisk: 'Critical - Uncovered Manholes & Heavy Runoff Silt' },
+      { id: 'bwssb', name: 'Water Supply & Sewerage Board', code: 'BWSSB', totalTickets: 16, activeBacklog: 6, slaCompliance: 88.5, avgResolutionHours: 6.2, grade: 'A-', bottleneckRisk: 'Low - Feeder Pipeline Clamps Well-Stocked' },
+      { id: 'swm', name: 'Solid Waste Management (SWM)', code: 'SWM', totalTickets: 31, activeBacklog: 7, slaCompliance: 95.2, avgResolutionHours: 3.4, grade: 'A+', bottleneckRisk: 'Minimal - Daytime Secondary Clearance On-Track' },
+      { id: 'forest', name: 'Forest & Horticulture Cell', code: 'FOREST', totalTickets: 12, activeBacklog: 4, slaCompliance: 86.0, avgResolutionHours: 7.5, grade: 'B+', bottleneckRisk: 'Low - Boom-Lifts Mobilized for Canopy Pruning' },
+    ];
+
+    const INITIAL_DUPLICATE_CLUSTERS = [
+      {
+        clusterId: 'CLUSTER-2026-088',
+        masterTicketId: 'CVX-2026-1035',
+        title: 'Marathahalli Underpass Arterial Crater Collapse',
+        category: 'Roads & Bridges',
+        severity: 'High',
+        ward: 'Ward 85 - Marathahalli ORR',
+        mergedCount: 6,
+        confidenceMatch: 94.2,
+        geoRadiusMeters: 140,
+        aggregateImpact: 35000,
+        satelliteTickets: ['CVX-2026-1035', 'CVX-2026-1036', 'CVX-2026-1037', 'CVX-2026-1038', 'CVX-2026-1044', 'CVX-2026-1045'],
+        status: 'CONSOLIDATED',
+        rootCause: 'Underpass drainage pump failure causing persistent sub-base erosion and recurrent cratering.'
+      },
+      {
+        clusterId: 'CLUSTER-2026-092',
+        masterTicketId: 'CVX-2026-1042',
+        title: 'Indiranagar KV School Live 11kV Feeder Snapping',
+        category: 'Electricity & Lighting',
+        severity: 'Critical',
+        ward: 'Ward 112 - Domlur / Indiranagar',
+        mergedCount: 4,
+        confidenceMatch: 98.6,
+        geoRadiusMeters: 45,
+        aggregateImpact: 4200,
+        satelliteTickets: ['CVX-2026-1042', 'CVX-2026-1043', 'CVX-2026-1047', 'CVX-2026-1048'],
+        status: 'CONSOLIDATED',
+        rootCause: 'High-tension cable snapped during storm; pedestrian entrance compromised near school.'
+      },
+      {
+        clusterId: 'CLUSTER-2026-094',
+        masterTicketId: 'CVX-2026-1017',
+        title: 'Central Silk Board 4-Way Traffic Signal Outage',
+        category: 'Public Safety & Hazards',
+        severity: 'High',
+        ward: 'Ward 142 - Silk Board Junction',
+        mergedCount: 8,
+        confidenceMatch: 96.0,
+        geoRadiusMeters: 220,
+        aggregateImpact: 45000,
+        satelliteTickets: ['CVX-2026-1017', 'CVX-2026-1018', 'CVX-2026-1019', 'CVX-2026-1020', 'CVX-2026-1025'],
+        status: 'CONSOLIDATED',
+        rootCause: 'Traffic PLC controller short circuit due to moisture ingress in underground distribution chamber.'
+      }
+    ];
+
+    const INITIAL_COMPLAINTS = [
+      {
+        id: 'CVX-2026-1042',
+        title: 'Snapped 11kV live power cable sparking across school entrance gate',
+        category: 'Electricity & Lighting',
+        categoryId: 'electricity',
+        severity: 'Critical',
+        department: 'Power Distribution Corp (DISCOM) - Quick Response',
+        ward: 'Ward 112 - Domlur / Indiranagar',
+        address: 'Opposite Kendriya Vidyalaya Gate 2, 100ft Road, Indiranagar',
+        lat: 12.9784,
+        lng: 77.6408,
+        status: 'IN_PROGRESS',
+        impactScore: 94,
+        impactPopulation: 4200,
+        createdAt: '2026-11-21T08:15:00Z',
+        citizenName: 'Ramesh Sundaram',
+        citizenPhone: '+91 98450-XXXXX',
+        citizenLanguage: 'English',
+        originalText: 'High tension cable snapped right across the KV school pedestrian gate after morning rain! It is actively sparking on the wet pavement. Over 800 school children arriving in 30 minutes! Please cut power immediately!',
+        summary: 'Emergency 11kV live power cable severed at primary school entrance. Active sparking on wet tarmac creates imminent electrocution hazard for arriving students and pedestrians.',
+        escalationTier: 2,
+        escalationHistory: [
+          { level: 1, to: 'DISCOM Feeder Squad', time: '08:16 AM', reason: 'Automated AI Critical Ingestion' },
+          { level: 2, to: 'Zonal Superintendent (East)', time: '08:45 AM', reason: 'High school footfall hazard threshold breached' }
+        ],
+        xai: {
+          confidence: 98.4,
+          primaryTriggers: ['11kV live wire', 'school entrance', 'sparking', 'wet pavement', 'pedestrian hazard'],
+          hazardLevel: 'Extreme Lethal Risk (Potential Fatal Electrocution)',
+          routingReason: 'Direct DISCOM emergency breaker trip required within 15 min.',
+          cvDetections: [
+            { label: 'Exposed High-Tension Cable (11kV)', conf: 0.98, box: [20, 30, 60, 45], color: '#EF4444' },
+            { label: 'Wet Conductive Pavement', conf: 0.94, box: [15, 65, 80, 25], color: '#F59E0B' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'DISCOM Feeder Squad (4 Linemen + 1 Safety Engineer)',
+          equipment: 'Boom Truck, 15kV Insulated Clamp Kit, Temporary Bypass Line',
+          materials: 'Copper Splice Clamps, HT Insulation Sleeve, Caution Barriers',
+          checklist: ['Breaker tripped at Indiranagar 66kV substation', 'Voltage pen probe confirmed zero potential', 'Traffic rerouted around Gate 2'],
+          estHours: 1.5,
+          costEstimate: '₹14,500'
+        },
+        duplicatesCount: 4,
+        clusterId: 'CLUSTER-2026-092',
+        isEmergency: true,
+        image: 'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'CVX-2026-1041',
+        title: 'Uncovered deep stormwater manhole on central bus corridor',
+        category: 'Drainage & Stormwater',
+        categoryId: 'drainage',
+        severity: 'Critical',
+        department: 'Stormwater Drain Division - Heavy Operations',
+        ward: 'Ward 150 - Koramangala 4th Block',
+        address: '80 Feet Road near Sony World Signal, Koramangala',
+        lat: 12.9348,
+        lng: 77.6253,
+        status: 'DISPATCHED',
+        impactScore: 88,
+        impactPopulation: 12500,
+        createdAt: '2026-11-21T07:42:00Z',
+        citizenName: 'Priya Narayanan',
+        citizenPhone: '+91 97412-XXXXX',
+        citizenLanguage: 'Tamil',
+        originalText: 'கோரமங்களா 80 அடி சாலையில் ஆழமான பாதாள சாக்கடை மூடி இல்லாமல் திறந்து கிடக்கிறது. இரண்டு பைக்குகள் தடுமாறி விழுந்துவிட்டன. மழை நீர் நிரம்பி குழி தெரியவில்லை.',
+        summary: 'Deep storm manhole missing cast-iron cover on high-speed dual carriageway. Submerged under rainwater runoff; two bike skid accidents already logged.',
+        escalationTier: 1,
+        escalationHistory: [
+          { level: 1, to: 'SWD Heavy Ops Unit', time: '07:43 AM', reason: 'Automated AI Critical Ingestion' }
+        ],
+        xai: {
+          confidence: 96.1,
+          primaryTriggers: ['open manhole', 'bus corridor', 'two-wheeler hazard', 'rainwater submerged'],
+          hazardLevel: 'Severe Structural & Vehicular Hazard',
+          routingReason: 'SWD Heavy Ops flagged for barricading and reinforced RCC slab installation.',
+          cvDetections: [
+            { label: 'Open Sewer Cavity (~1.2m depth)', conf: 0.96, box: [35, 40, 30, 35], color: '#EF4444' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'SWD Emergency Road Patch Unit (3 Technicians)',
+          equipment: 'Heavy Duty Cast Iron Manhole Grating, Reflective Caution Cones, Hydraulic Hoist',
+          materials: 'Grade 60 Cast Iron Grate, Fast-setting Curing Mortar',
+          checklist: ['High-visibility reflective cones placed 30m prior', 'Sewer gas detector test completed', 'Grate locked with security bolt'],
+          estHours: 2.0,
+          costEstimate: '₹8,200'
+        },
+        duplicatesCount: 2,
+        clusterId: null,
+        isEmergency: true,
+        image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'CVX-2026-1039',
+        title: 'Toxic chemical sludge and 2 tons commercial poultry waste dumped on lake buffer',
+        category: 'Solid Waste & Sanitation',
+        categoryId: 'waste',
+        severity: 'High',
+        department: 'Solid Waste Management (SWM) - Rapid Action Cell',
+        ward: 'Ward 174 - Bellandur Lake Periphery',
+        address: 'Yemalur Lake Road, Green Glen Layout edge',
+        lat: 12.9360,
+        lng: 77.6710,
+        status: 'AI_TRIAGED',
+        impactScore: 78,
+        impactPopulation: 6500,
+        createdAt: '2026-11-21T06:20:00Z',
+        citizenName: 'Anil Kumar Gowda',
+        citizenPhone: '+91 98860-XXXXX',
+        citizenLanguage: 'Kannada',
+        originalText: 'ಬೆಳ್ಳಂದೂರು ಕೆರೆ ಬಳಿ ರಾತ್ರೋರಾತ್ರಿ ಟಿಪ್ಪರ್ ಲಾರಿಯಲ್ಲಿ ವಿಷಕಾರಿ ರಾಸಾಯನಿಕ ತ್ಯಾಜ್ಯ ಮತ್ತು ಕೋಳಿ ತ್ಯಾಜ್ಯ ಸುರಿಯಲಾಗಿದೆ. ವಿಪರೀತ ದುರ್ವಾಸನೆ ಹಾಗೂ ಹೊಗೆ ಬರುತ್ತಿದೆ.',
+        summary: 'Massive illegal dumping of hazardous industrial effluent and decomposing poultry refuse directly into wetland buffer zone. High contamination and air hazard.',
+        escalationTier: 1,
+        escalationHistory: [
+          { level: 1, to: 'SWM Bio-sanitization Cell', time: '06:22 AM', reason: 'Biohazard threshold verified' }
+        ],
+        xai: {
+          confidence: 94.7,
+          primaryTriggers: ['toxic sludge', 'wetland buffer', 'poultry waste', 'chemical odor'],
+          hazardLevel: 'Environmental Biohazard',
+          routingReason: 'SWM Bio-sanitization crew paired with Pollution Control Board enforcement.',
+          cvDetections: [
+            { label: 'Commercial Chemical Sludge Heap', conf: 0.93, box: [25, 45, 55, 40], color: '#F59E0B' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'Biohazard Cleanup Crew (6 Workers + Bio-protective suits)',
+          equipment: 'JCB Backhoe Loader, 2 Tipper Trucks, Bleaching Sanitizer Spray Rig',
+          materials: '150kg Calcium Hypochlorite (Bleach), Neutralizing Lime Powder',
+          checklist: ['Water runoff barrier erected to protect lake inlet', 'Waste samples logged for forensic chemical tracing'],
+          estHours: 4.5,
+          costEstimate: '₹32,000'
+        },
+        duplicatesCount: 1,
+        clusterId: null,
+        isEmergency: false,
+        image: 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'CVX-2026-1035',
+        title: 'Crater pothole spanning 1.8 meters across Outer Ring Road underpass',
+        category: 'Roads & Bridges',
+        categoryId: 'roads',
+        severity: 'High',
+        department: 'Public Works Department (PWD) - Arterial Highways',
+        ward: 'Ward 85 - Marathahalli ORR',
+        address: 'Marathahalli Multiplex Underpass, Airport bound lane',
+        lat: 12.9562,
+        lng: 77.7011,
+        status: 'IN_PROGRESS',
+        impactScore: 86,
+        impactPopulation: 35000,
+        createdAt: '2026-11-20T21:40:00Z',
+        citizenName: 'Vikramaditya Roy',
+        citizenPhone: '+91 99001-XXXXX',
+        citizenLanguage: 'English',
+        originalText: 'Underpass road surface completely shattered. A pothole more than 6 feet wide and 8 inches deep has developed right at the blind curve. Caused 3km jam this morning.',
+        summary: 'Severe road sub-base collapse underpass flyover. Diameter ~1.8m, depth ~20cm on arterial transit lane causing heavy traffic paralysis and vehicle axle damages.',
+        escalationTier: 2,
+        escalationHistory: [
+          { level: 1, to: 'PWD Paving Division', time: '09:00 PM', reason: 'Report Filed' },
+          { level: 2, to: 'Superintendent Engineer (Highways)', time: '06:30 AM', reason: 'High transit gridlock threshold + 6 duplicates' }
+        ],
+        xai: {
+          confidence: 97.2,
+          primaryTriggers: ['blind curve', 'arterial road', 'sub-base failure', 'crater pothole'],
+          hazardLevel: 'Critical Transit Disruption',
+          routingReason: 'PWD Asphalt Quick-Paving Team deployed with cold mix.',
+          cvDetections: [
+            { label: 'Asphalt Delamination Crater', conf: 0.95, box: [20, 35, 60, 50], color: '#F59E0B' },
+            { label: 'Exposed Aggregate Sub-layer', conf: 0.91, box: [30, 45, 40, 30], color: '#06B6D4' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'Asphalt Repair Unit (5 Road Workers + 1 Roller Operator)',
+          equipment: 'Mini Road Roller, Cold Mix Bitumen (1.2 Tons), Tack Coat Sprayer',
+          materials: '1.2 Tons Cold Bituminous Macadam, Bitumen Emulsion RS-1',
+          checklist: ['Cavity vacuumed of standing water and loose stones', 'Tack coat applied uniformly', 'Compacted with minimum 6 roller passes'],
+          estHours: 3.0,
+          costEstimate: '₹22,000'
+        },
+        duplicatesCount: 6,
+        clusterId: 'CLUSTER-2026-088',
+        isEmergency: false,
+        image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'CVX-2026-1028',
+        title: 'Burst 600mm potable water feeder line flooding entire residential lane',
+        category: 'Water Supply & Treatment',
+        categoryId: 'water',
+        severity: 'High',
+        department: 'Water Supply & Sewerage Board - Distribution',
+        ward: 'Ward 65 - Malleshwaram 8th Cross',
+        address: 'Margosa Road, Cross 8, Near Canara Bank',
+        lat: 13.0031,
+        lng: 77.5694,
+        status: 'RESOLVED',
+        impactScore: 75,
+        impactPopulation: 4800,
+        createdAt: '2026-11-20T14:10:00Z',
+        citizenName: 'Dr. Meenakshi S.',
+        citizenPhone: '+91 94480-XXXXX',
+        citizenLanguage: 'Kannada',
+        originalText: 'ಕಳೆದ 4 ಗಂಟೆಗಳಿಂದ ಕುಡಿಯುವ ನೀರಿನ ಮುಖ್ಯ ಪೈಪ್ ಒಡೆದು ರಸ್ತೆಯೆಲ್ಲಾ ಜಲಾವೃತವಾಗಿದೆ. ಸಾವಿರಾರು ಲೀಟರ್ ಶುದ್ಧ ನೀರು ವ್ಯರ್ಥವಾಗುತ್ತಿದೆ.',
+        summary: 'Catastrophic rupture of 600mm treated water transmission pipeline. Street inundated, causing severe loss of potable water and basement flooding in 6 houses.',
+        escalationTier: 1,
+        escalationHistory: [{ level: 1, to: 'BWSSB Valve Section', time: '02:15 PM', reason: 'High Pressure Line Rupture' }],
+        xai: {
+          confidence: 96.5,
+          primaryTriggers: ['potable pipeline burst', 'street inundation', 'basement waterlogging'],
+          hazardLevel: 'Municipal Resource & Structural Loss',
+          routingReason: 'BWSSB Valve Section notified to isolate grid and weld collar.',
+          cvDetections: [
+            { label: 'High-Pressure Water Geyser', conf: 0.97, box: [40, 20, 25, 60], color: '#3B82F6' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'BWSSB Pipeline Restoration Team (4 Pipe Fitters + 1 Welder)',
+          equipment: 'Dewatering Sump Pump (50 HP), Pipe Clamp Sleeve 600mm, Arc Welder',
+          materials: 'Split Collar Clamp 600mm, EPDM Gasket Sheet',
+          checklist: ['Sluice valve isolated', 'Trench dewatered', 'Pressure test at 8 bar completed'],
+          estHours: 4.0,
+          costEstimate: '₹28,500'
+        },
+        duplicatesCount: 3,
+        clusterId: null,
+        isEmergency: false,
+        image: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'CVX-2026-1017',
+        title: 'Non-functioning 4-way traffic signals causing extreme gridlock & near collisions',
+        category: 'Public Safety & Hazards',
+        categoryId: 'safety',
+        severity: 'High',
+        department: 'Municipal Disaster & Safety Bureau - Traffic Tech',
+        ward: 'Ward 142 - Silk Board Junction',
+        address: 'Outer Ring Road intersection at Central Silk Board',
+        lat: 12.9176,
+        lng: 77.6238,
+        status: 'IN_PROGRESS',
+        impactScore: 92,
+        impactPopulation: 45000,
+        createdAt: '2026-11-20T09:15:00Z',
+        citizenName: 'Shalini V.',
+        citizenPhone: '+91 98440-XXXXX',
+        citizenLanguage: 'English',
+        originalText: 'All four signal faces completely blacked out since 8 AM peak hour. Complete chaos, ambulances stuck, pedestrians cannot cross 6 lane road.',
+        summary: 'Power and PLC controller outage at metropolitan multi-corridor junction. Severe gridlock spreading to 3 adjoining wards; emergency transit stalled.',
+        escalationTier: 2,
+        escalationHistory: [{ level: 2, to: 'Traffic Commissioner Desk', time: '09:40 AM', reason: 'Transit paralysis across 3 arterial wards' }],
+        xai: {
+          confidence: 95.9,
+          primaryTriggers: ['blackout signals', 'ambulance blocked', 'multi-corridor intersection'],
+          hazardLevel: 'Widespread Transit Gridlock',
+          routingReason: 'Traffic Engineering Cell dispatched with standby UPS controller.',
+          cvDetections: [
+            { label: 'Unpowered Signal Head', conf: 0.92, box: [45, 15, 15, 30], color: '#EF4444' }
+          ]
+        },
+        fieldRecommendation: {
+          crew: 'Traffic Systems Techs (2 Engineers) + 4 Traffic Wardens',
+          equipment: 'Traffic PLC Backup Board, Portable Inverter Pack, Signal Tester',
+          materials: '24V DC Solid State Controller, Moisture-proof Junction Seals',
+          checklist: ['Manual traffic wardens deployed at 4 corners', 'UPS battery replaced', 'Cycle timing calibrated to 120s'],
+          estHours: 1.0,
+          costEstimate: '₹6,000'
+        },
+        duplicatesCount: 8,
+        clusterId: 'CLUSTER-2026-094',
+        isEmergency: false,
+        image: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+
+    const DEMO_SCENARIOS = [
+      {
+        name: 'Live 11kV Cable at School',
+        badge: 'Critical // Electricity',
+        color: 'rose',
+        lang: 'English',
+        text: 'Live 11kV electrical wire broken and hanging 3 feet above school bus pathway near Gate 1. Sparking vigorously after morning showers!',
+        address: 'Kendriya Vidyalaya, Indiranagar, Bangalore',
+        lat: 12.9785,
+        lng: 77.6410,
+        image: 'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        name: 'Open Manhole on Ring Road',
+        badge: 'Critical // Drainage',
+        color: 'rose',
+        lang: 'Tamil',
+        text: 'ரிங் ரோட்டில் ஆழமான பாதாள சாக்கடை மூடி உடைந்து விழுந்துவிட்டது. கனமழை நீர் பாய்வதால் குழி தெரியவில்லை. உடனே சரிசெய்யவும்!',
+        address: 'Koramangala 80 Feet Road Junction, Bangalore',
+        lat: 12.9350,
+        lng: 77.6250,
+        image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        name: 'Toxic Chemical Sludge in Lake',
+        badge: 'High // Waste',
+        color: 'amber',
+        lang: 'Kannada',
+        text: 'ಬೆಳ್ಳಂದೂರು ಕೆರೆ ಬಳಿ ರಾತ್ರೋರಾತ್ರಿ ಟಿಪ್ಪರ್ ಲಾರಿಯಲ್ಲಿ ವಿಷಕಾರಿ ರಾಸಾಯನಿಕ ತ್ಯಾಜ್ಯ ಸುರಿಯಲಾಗಿದೆ. ವಿಪರೀತ ದುರ್ವಾಸನೆ ಬರುತ್ತಿದೆ.',
+        address: 'Yemalur Lake Road, Bellandur, Bangalore',
+        lat: 12.9360,
+        lng: 77.6710,
+        image: 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        name: 'Burst Potable Water Pipeline',
+        badge: 'High // Water',
+        color: 'cyan',
+        lang: 'Hindi',
+        text: 'मार्गोसा रोड पर मुख्य पेयजल पाइपलाइन फट गई है और सारा पानी सड़कों पर बह रहा है। घरों में पानी घुस रहा है।',
+        address: '8th Cross, Margosa Road, Malleshwaram, Bangalore',
+        lat: 13.0030,
+        lng: 77.5690,
+        image: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        name: 'Crater Pothole on Flyover Ramp',
+        badge: 'High // Roads',
+        color: 'amber',
+        lang: 'English',
+        text: 'Deep crater pothole measuring 2 meters wide and 25cm deep on the airport flyover approach ramp. Cars swerving dangerously into oncoming traffic.',
+        address: 'Hebbal Flyover Ramp, Bangalore',
+        lat: 13.0358,
+        lng: 77.5970,
+        image: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+
+    const REGIONAL_LANGUAGES = [
+      { code: 'en', name: 'English', native: 'English' },
+      { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
+      { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
+      { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
+      { code: 'te', name: 'Telugu', native: 'తెలుగు' },
+      { code: 'bn', name: 'Bengali', native: 'বাংলা' },
+      { code: 'mr', name: 'Marathi', native: 'मराठी' },
+    ];
+
+    const analyzeComplaintWithAI = (text, userAddress, userImage) => {
+      const lower = text.toLowerCase();
+
+      let categoryId = 'roads';
+      let confidence = 88.5;
+
+      if (lower.includes('wire') || lower.includes('electric') || lower.includes('spark') || lower.includes('current') || lower.includes('pole') || lower.includes('transformer') || lower.includes('बिजली') || lower.includes('ವಿದ್ಯುತ್') || lower.includes('மின்சாரம்')) {
+        categoryId = 'electricity';
+        confidence = 98.2;
+      } else if (lower.includes('manhole') || lower.includes('drain') || lower.includes('sewer') || lower.includes('gutter') || lower.includes('flood') || lower.includes('नाली') || lower.includes('ಚರಂಡಿ') || lower.includes('சாக்கடை')) {
+        categoryId = 'drainage';
+        confidence = 97.4;
+      } else if (lower.includes('water') || lower.includes('pipeline') || lower.includes('tap') || lower.includes('drinking') || lower.includes('burst') || lower.includes('पानी') || lower.includes('ನೀರು') || lower.includes('தண்ணீர்')) {
+        categoryId = 'water';
+        confidence = 96.6;
+      } else if (lower.includes('garbage') || lower.includes('waste') || lower.includes('dump') || lower.includes('trash') || lower.includes('sludge') || lower.includes('कचरा') || lower.includes('ತ್ಯಾಜ್ಯ') || lower.includes('குப்பை')) {
+        categoryId = 'waste';
+        confidence = 95.8;
+      } else if (lower.includes('tree') || lower.includes('branch') || lower.includes('forest') || lower.includes('falling') || lower.includes('पेड़') || lower.includes('ಮರ') || lower.includes('மரம்')) {
+        categoryId = 'trees';
+        confidence = 94.9;
+      } else if (lower.includes('signal') || lower.includes('safety') || lower.includes('hazard') || lower.includes('accident') || lower.includes('collapse')) {
+        categoryId = 'safety';
+        confidence = 93.5;
+      } else if (lower.includes('pothole') || lower.includes('road') || lower.includes('asphalt') || lower.includes('pavement') || lower.includes('crater') || lower.includes('सड़क') || lower.includes('ರಸ್ತೆ') || lower.includes('சாலை')) {
+        categoryId = 'roads';
+        confidence = 95.0;
+      }
+
+      const catObj = CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[0];
+
+      let severity = 'Medium';
+      let hazardReason = 'Standard municipal maintenance issue with moderate localized impact.';
+      let triggers = [];
+
+      const criticalTerms = ['live wire', 'sparking', 'open manhole', 'school', 'hospital', 'fatal', 'accident', 'children', 'poison', 'emergency', 'electric', 'submerged', 'current', 'विद्युत', 'உயிர் ஆபத்து'];
+      const highTerms = ['pothole', 'flyover', 'burst', 'arterial', 'underpass', 'toxic', 'gridlock', 'jam', 'signal down', 'huge', 'deep'];
+
+      const matchesCritical = criticalTerms.filter(t => lower.includes(t));
+      const matchesHigh = highTerms.filter(t => lower.includes(t));
+
+      if (matchesCritical.length > 0) {
+        severity = 'Critical';
+        triggers = matchesCritical;
+        hazardReason = `High hazard detected (${matchesCritical.join(', ')}). Imminent danger to pedestrian or vehicular safety requiring immediate dispatch within 2 hours.`;
+      } else if (matchesHigh.length > 0) {
+        severity = 'High';
+        triggers = matchesHigh;
+        hazardReason = `Substantial public infrastructure disruption (${matchesHigh.join(', ')}). High traffic or sanitation failure requiring 12-hour resolution.`;
+      } else if (lower.length > 120) {
+        severity = 'Medium';
+        triggers = ['multi-point report', 'structural impairment'];
+        hazardReason = 'Moderate localized impairment requiring scheduled departmental intervention within 36 hours.';
+      } else {
+        severity = 'Low';
+        triggers = ['routine upkeep'];
+        hazardReason = 'Non-hazardous municipal maintenance task assigned to standard routine queue.';
+      }
+
+      let impactScore = 55;
+      if (severity === 'Critical') impactScore = Math.floor(88 + Math.random() * 10);
+      else if (severity === 'High') impactScore = Math.floor(70 + Math.random() * 15);
+      else if (severity === 'Medium') impactScore = Math.floor(45 + Math.random() * 20);
+      else impactScore = Math.floor(25 + Math.random() * 15);
+
+      const impactPopulation = impactScore * (severity === 'Critical' ? 45 : 25) + 350;
+      const generatedSummary = `AI Triage: Verified report classified under ${catObj.name}. Evaluated as ${severity} priority due to ${hazardReason.slice(0, 80)}... Field dispatch ticket generated for ${catObj.dept}.`;
+
+      const cvDetections = [
+        { label: `AI Identified: ${catObj.name} Defect`, conf: (confidence / 100).toFixed(2), box: [25, 30, 50, 45], color: severity === 'Critical' ? '#EF4444' : '#06B6D4' }
+      ];
+
+      return {
+        category: catObj.name,
+        categoryId: catObj.id,
+        severity,
+        department: catObj.dept,
+        confidence,
+        summary: generatedSummary,
+        hazardReason,
+        triggers,
+        impactScore,
+        impactPopulation,
+        cvDetections,
+        slaHours: SEVERITY_CONFIG[severity].slaHours
+      };
+    };
+
+    // ========================================================
+    // 6. ENHANCED LEAFLET MAP WITH CONCENTRIC GLOW & RADAR
+    // ========================================================
+    const CityIncidentMap = ({ complaints, selectedId, onSelectTicket, onMapClick, interactiveMode = false, center = [12.9716, 77.5946], zoom = 12 }) => {
+      const mapContainerRef = useRef(null);
+      const mapInstanceRef = useRef(null);
+      const markersRef = useRef({});
+      const [mapLayer, setMapLayer] = useState('all');
+
+      useEffect(() => {
+        if (!mapContainerRef.current) return;
+        if (!window.L) return;
+
+        const map = window.L.map(mapContainerRef.current, {
+          center: center,
+          zoom: zoom,
+          zoomControl: false,
+          attributionControl: false
+        });
+
+        window.L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+          subdomains: 'abcd',
+        }).addTo(map);
+
+        window.L.control.zoom({ position: 'bottomright' }).addTo(map);
+        mapInstanceRef.current = map;
+
+        if (interactiveMode && onMapClick) {
+          map.on('click', (e) => {
+            onMapClick(e.latlng.lat, e.latlng.lng);
+          });
+        }
+
+        return () => {
+          map.remove();
+          mapInstanceRef.current = null;
+        };
+      }, []);
+
+      const filteredComplaints = useMemo(() => {
+        if (mapLayer === 'all') return complaints;
+        if (mapLayer === 'critical') return complaints.filter(c => c.severity === 'Critical');
+        return complaints.filter(c => c.categoryId === mapLayer);
+      }, [complaints, mapLayer]);
+
+      useEffect(() => {
+        const map = mapInstanceRef.current;
+        if (!map || !window.L) return;
+
+        Object.values(markersRef.current).forEach(m => map.removeLayer(m));
+        markersRef.current = {};
+
+        filteredComplaints.forEach(item => {
+          if (!item.lat || !item.lng) return;
+
+          const sevConf = SEVERITY_CONFIG[item.severity] || SEVERITY_CONFIG.Medium;
+          const isSelected = item.id === selectedId;
+
+          const customHtml = `
+            <div class="relative cursor-pointer group select-none">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white shadow-xl transition-transform duration-200 group-hover:scale-125 ${sevConf.pinClass} ${isSelected ? 'ring-4 ring-cyan-400 scale-125' : ''}" style="background-color: ${sevConf.markerBg};">
+                ${item.severity === 'Critical' ? '!' : item.category.charAt(0)}
+              </div>
+              <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${item.status === 'RESOLVED' ? 'bg-emerald-400' : 'bg-cyan-400'} ring-1 ring-slate-950"></div>
+            </div>
+          `;
+
+          const customIcon = window.L.divIcon({
+            html: customHtml,
+            className: 'bg-transparent border-none',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            popupAnchor: [0, -16]
+          });
+
+          const marker = window.L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+
+          const popupContent = `
+            <div class="p-3 space-y-1.5 text-xs font-sans" style="min-width: 220px;">
+              <div class="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-1.5">
+                <span class="font-mono font-bold text-cyan-400 tracking-wide">${item.id}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${sevConf.badge}">${item.severity}</span>
+              </div>
+              <p class="font-semibold text-slate-100 text-xs mt-1 line-clamp-2 leading-tight">${item.title}</p>
+              <p class="text-slate-400 text-[11px] font-mono">${item.ward}</p>
+              <div class="pt-2 flex items-center justify-between border-t border-slate-800">
+                <span class="text-[10px] text-cyan-300 font-mono">Impact: ${item.impactScore}/100</span>
+                <button class="px-2.5 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-bold text-[11px] border border-cyan-500/40" onclick="window.dispatchViewTicket('${item.id}')">Inspect &rarr;</button>
+              </div>
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+
+          marker.on('click', () => {
+            if (onSelectTicket) onSelectTicket(item.id);
+          });
+
+          markersRef.current[item.id] = marker;
+        });
+      }, [filteredComplaints, selectedId]);
+
+      // Fly to selected ticket when selectedId changes externally
+      useEffect(() => {
+        if (!selectedId || !mapInstanceRef.current) return;
+        const target = complaints.find(c => c.id === selectedId);
+        if (target && target.lat && target.lng) {
+          mapInstanceRef.current.flyTo([target.lat, target.lng], 15, { duration: 1.2 });
+          if (markersRef.current[selectedId]) {
+            markersRef.current[selectedId].openPopup();
+          }
+        }
+      }, [selectedId]);
+
+      const flyToHotspot = (lat, lng, zoomLevel = 15) => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.flyTo([lat, lng], zoomLevel, { duration: 1.4 });
+        }
+      };
+
+      return (
+        <div className="relative w-full h-full min-h-[340px] rounded-2xl overflow-hidden border border-slate-800/90 shadow-2xl">
+          <div ref={mapContainerRef} className="w-full h-full" />
+          
+          <div className="absolute top-3 left-3 z-[400] glass-card px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-2xl flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-mono text-cyan-400 font-bold flex items-center gap-1.5 mr-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              METRO TELEMETRY
+            </span>
+            {[
+              { id: 'all', label: 'All Incidents' },
+              { id: 'critical', label: '🚨 Critical P1' },
+              { id: 'electricity', label: '⚡ Power Grid' },
+              { id: 'drainage', label: '🌊 Drainage' },
+              { id: 'roads', label: '🛣️ Roads & PWD' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setMapLayer(tab.id)}
+                className={`px-2 py-1 rounded-lg text-[11px] font-medium transition ${
+                  mapLayer === tab.id
+                    ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan-sm'
+                    : 'bg-slate-900/60 text-slate-400 hover:text-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="absolute top-3 right-3 z-[400] glass-card px-2.5 py-1.5 rounded-xl border border-slate-700/80 shadow-2xl hidden md:flex items-center gap-1.5 text-[11px]">
+            <span className="text-slate-400 font-mono text-[10px] mr-1">QUICK JUMP:</span>
+            <button onClick={() => flyToHotspot(12.9784, 77.6408)} className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300">Indiranagar</button>
+            <button onClick={() => flyToHotspot(12.9348, 77.6253)} className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300">Koramangala</button>
+            <button onClick={() => flyToHotspot(12.9176, 77.6238)} className="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300">Silk Board</button>
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 7. DUPLICATE CLUSTERING & INCIDENT MERGE HUB (Feature 2)
+    // ========================================================
+    const DuplicateClusterHub = ({ clusters, complaints, onSelectTicket, triggerSound }) => {
+      return (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <Icon name="copy" size={22} className="text-violet-400" />
+                <span>Intelligent Duplicate Detection & Incident Clusters</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Machine learning clusters citizen reports referring to the same physical incident via NLP cosine similarity, image perceptual hashing, and geo-proximity (&lt;350m).
+              </p>
+            </div>
+            <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-violet-500/20 text-violet-300 border border-violet-500/40">
+              {clusters.length} ACTIVE CLUSTERS
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {clusters.map(cluster => (
+              <div key={cluster.clusterId} className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between hover:border-violet-500/40 transition shadow-xl">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-extrabold text-violet-400">{cluster.clusterId}</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 font-bold">
+                      {cluster.mergedCount} CITIZEN REPORTS
+                    </span>
+                  </div>
+
+                  <h3 className="font-bold text-sm text-white leading-snug">{cluster.title}</h3>
+                  <p className="text-xs text-slate-400">{cluster.ward}</p>
+
+                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span>Semantic Similarity:</span>
+                      <strong className="text-cyan-400 font-mono">{cluster.confidenceMatch}%</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span>Proximity Radius:</span>
+                      <strong className="text-emerald-400 font-mono">&lt;{cluster.geoRadiusMeters} meters</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span>Consolidated Impact:</span>
+                      <strong className="text-amber-400 font-mono">{cluster.aggregateImpact.toLocaleString()} citizens</strong>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-slate-300 bg-violet-950/20 border border-violet-500/30 p-2.5 rounded-xl">
+                    <strong className="text-violet-300 block mb-0.5">Root Cause Diagnosis:</strong>
+                    {cluster.rootCause}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-slate-500">Master: {cluster.masterTicketId}</span>
+                  <button
+                    onClick={() => {
+                      onSelectTicket(cluster.masterTicketId);
+                      triggerSound('click');
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs shadow-glow-violet transition"
+                  >
+                    Inspect Master Ticket &rarr;
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 8. DEPARTMENT PERFORMANCE & BOTTLENECK INSIGHTS (Feature 10)
+    // ========================================================
+    const DepartmentPerformanceView = ({ triggerSound }) => {
+      return (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <Icon name="trendingUp" size={22} className="text-cyan-400" />
+                <span>Department Performance & Backlog Analytics</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Continuous municipal telemetry tracking resolution velocity, SLA compliance rates, and operational bottlenecks.
+              </p>
+            </div>
+            <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/40">
+              MUNICIPAL AUDIT PROTOCOL
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {DEPARTMENT_METRICS.map(dept => (
+              <div key={dept.id} className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4 hover:border-cyan-500/40 transition shadow-xl flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-cyan-300">
+                      {dept.code}
+                    </span>
+                    <span className={`text-sm font-black px-2 py-0.5 rounded font-mono ${
+                      dept.grade.startsWith('A') ? 'bg-emerald-500/20 text-emerald-300' :
+                      dept.grade.startsWith('B') ? 'bg-amber-500/20 text-amber-300' :
+                      'bg-rose-500/20 text-rose-300'
+                    }`}>
+                      GRADE {dept.grade}
+                    </span>
+                  </div>
+
+                  <h3 className="font-bold text-sm text-white">{dept.name}</h3>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                    <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                      <span className="text-[10px] font-mono text-slate-400 block">ACTIVE BACKLOG</span>
+                      <strong className="text-base font-bold text-white font-mono">{dept.activeBacklog}</strong>
+                      <span className="text-[10px] text-slate-500 ml-1">of {dept.totalTickets} total</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                      <span className="text-[10px] font-mono text-slate-400 block">SLA COMPLIANCE</span>
+                      <strong className={`text-base font-bold font-mono ${dept.slaCompliance > 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {dept.slaCompliance}%
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between text-xs">
+                    <span className="text-slate-400 text-[11px]">Avg Resolution Time:</span>
+                    <span className="font-mono font-bold text-cyan-300">{dept.avgResolutionHours} Hours</span>
+                  </div>
+
+                  <div className="text-[11px] p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-slate-300">
+                    <strong className="text-amber-400 block mb-0.5">Bottleneck Risk:</strong>
+                    {dept.bottleneckRisk}
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800">
+                  <button
+                    onClick={() => triggerSound('click')}
+                    className="w-full py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold text-center transition"
+                  >
+                    View Dispatch Roster &rarr;
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 9. REAL-TIME ACTIVITY TIMELINE FEED COMPONENT
+    // ========================================================
+    const LiveActivityTimeline = ({ complaints, onSelectTicket, triggerSound }) => {
+      const liveEvents = useMemo(() => {
+        return [
+          { id: 'EV-1', type: 'critical', title: 'P1 Escalation: Snapped 11kV Wire', ward: 'Indiranagar Gate 2', time: 'Just now', ticketId: 'CVX-2026-1042', icon: 'zap', color: 'rose' },
+          { id: 'EV-2', type: 'cluster', title: '6 Duplicate Reports Merged: Crater Pothole', ward: 'Marathahalli Flyover', time: '8m ago', ticketId: 'CVX-2026-1035', icon: 'copy', color: 'violet' },
+          { id: 'EV-3', type: 'dispatch', title: 'SWD Heavy Crew Dispatched to Open Manhole', ward: 'Koramangala 80ft Rd', time: '21m ago', ticketId: 'CVX-2026-1041', icon: 'activity', color: 'cyan' },
+          { id: 'EV-4', type: 'verified', title: 'Citizen Verified: 600mm Pipe Rupture Sealed (5★)', ward: 'Malleshwaram 8th Cross', time: '42m ago', ticketId: 'CVX-2026-1028', icon: 'check', color: 'emerald' },
+          { id: 'EV-5', type: 'predictive', title: 'Preventative Warning: Monsoon Runoff +42%', ward: 'Koramangala Ward 150', time: '1h ago', ticketId: 'CVX-2026-1041', icon: 'alert', color: 'amber' },
+        ];
+      }, []);
+
+      return (
+        <div className="glass-card p-4 rounded-2xl border border-slate-800 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              </span>
+              <h3 className="font-bold text-sm text-white font-sans">Live Municipal Activity Feed</h3>
+            </div>
+            <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">TELEMETRY STREAM</span>
+          </div>
+
+          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            {liveEvents.map(evt => (
+              <div
+                key={evt.id}
+                onClick={() => {
+                  if (onSelectTicket && evt.ticketId) {
+                    onSelectTicket(evt.ticketId);
+                    triggerSound('click');
+                  }
+                }}
+                className="p-2.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-cyan-500/30 transition cursor-pointer flex items-start gap-3 group"
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                  evt.color === 'rose' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                  evt.color === 'violet' ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30' :
+                  evt.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                  evt.color === 'amber' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                  'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                }`}>
+                  <Icon name={evt.icon} size={15} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-semibold text-xs text-white group-hover:text-cyan-300 transition truncate">{evt.title}</span>
+                    <span className="text-[10px] font-mono text-slate-500 shrink-0">{evt.time}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 mt-0.5">
+                    <span className="truncate">{evt.ward}</span>
+                    <span className="font-mono text-cyan-400/80 text-[10px]">{evt.ticketId}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 10. AUTONOMOUS CIVIC AI INSIGHTS WIDGET
+    // ========================================================
+    const CivicAiInsightsPanel = ({ triggerSound }) => {
+      const [approvedDispatches, setApprovedDispatches] = useState({});
+
+      const insights = [
+        {
+          id: 'INS-1',
+          hazard: 'Monsoon Runoff Surge Risk (88% Prob)',
+          ward: 'Ward 150 - Koramangala 4th Block',
+          insight: 'Runoff velocity in central SWD trunk increased +42% after rainfall. 2 dewatering sumps required before evening traffic peak.',
+          rec: 'Deploy 2x 50HP Submersible Pumps at Sony World junction.',
+          cost: '₹12,000 est.',
+          priority: 'CRITICAL',
+          color: 'rose'
+        },
+        {
+          id: 'INS-2',
+          hazard: '11kV Feeder Voltage Sags & Arcing',
+          ward: 'Ward 112 - Domlur / Indiranagar',
+          insight: 'Overhead cable tension dropped 14% across KV School perimeter. High risk of secondary tree-branch contact during winds.',
+          rec: 'Emergency pruning clearance by BBMP Forest Cell + DISCOM line tensioner.',
+          cost: '₹8,500 est.',
+          priority: 'HIGH',
+          color: 'amber'
+        },
+        {
+          id: 'INS-3',
+          hazard: 'Recurrent Underpass Sub-base Failure',
+          ward: 'Ward 85 - Marathahalli ORR',
+          insight: '14 repeat pothole complaints within 60 days. Surface cold patching fails due to underlying water table seepage.',
+          rec: 'Schedule nocturnal Geotextile underlay re-asphalting order.',
+          cost: '₹45,000 est.',
+          priority: 'OPTIMIZATION',
+          color: 'cyan'
+        }
+      ];
+
+      const handleApprove = (id) => {
+        setApprovedDispatches(prev => ({ ...prev, [id]: true }));
+        triggerSound('success');
+      };
+
+      return (
+        <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-glow-cyan">
+                <Icon name="sparkles" size={16} />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">Autonomous Civic AI Insights</h3>
+                <p className="text-[11px] text-slate-400">Algorithmic infrastructure recommendations generated from multi-ward sensor streams</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/30 font-bold">
+              AI ENGINE V2.6
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {insights.map(item => {
+              const isApproved = approvedDispatches[item.id];
+              return (
+                <div key={item.id} className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/90 space-y-2 flex flex-col justify-between hover:border-cyan-500/30 transition">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                        item.color === 'rose' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' :
+                        item.color === 'amber' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                        'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                      }`}>
+                        {item.priority}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-500">{item.ward.split('-')[0]}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-white leading-snug">{item.hazard}</h4>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">{item.insight}</p>
+                    <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800/80 text-[11px] text-cyan-300">
+                      <strong>AI Action:</strong> {item.rec}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between border-t border-slate-800/80 mt-2">
+                    <span className="text-[10px] font-mono text-slate-400">{item.cost}</span>
+                    <button
+                      onClick={() => handleApprove(item.id)}
+                      disabled={isApproved}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                        isApproved
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-default'
+                          : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-glow-cyan-sm'
+                      }`}
+                    >
+                      {isApproved ? '✓ Dispatched' : 'Approve Dispatch'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 11. MAIN CIVICLENS APPLICATION CONTAINER
+    // ========================================================
+    const CivicLensApp = () => {
+      const [complaints, setComplaints] = useState(() => {
+        try {
+          const saved = localStorage.getItem('civiclens_complaints_v4');
+          return saved ? JSON.parse(saved) : INITIAL_COMPLAINTS;
+        } catch (e) {
+          return INITIAL_COMPLAINTS;
+        }
+      });
+
+      const [clusters, setClusters] = useState(() => {
+        try {
+          const saved = localStorage.getItem('civiclens_clusters_v2');
+          return saved ? JSON.parse(saved) : INITIAL_DUPLICATE_CLUSTERS;
+        } catch (e) {
+          return INITIAL_DUPLICATE_CLUSTERS;
+        }
+      });
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('civiclens_complaints_v4', JSON.stringify(complaints));
+          localStorage.setItem('civiclens_clusters_v2', JSON.stringify(clusters));
+        } catch (e) {}
+      }, [complaints, clusters]);
+
+      const [activeTab, setActiveTab] = useState('command');
+      const [selectedTicketId, setSelectedTicketId] = useState(complaints[0]?.id || null);
+      const [showTicketModal, setShowTicketModal] = useState(false);
+      const [showXaiModal, setShowXaiModal] = useState(false);
+      const [showCopilot, setShowCopilot] = useState(false);
+      const [soundEnabled, setSoundEnabled] = useState(true);
+      const [globalSearch, setGlobalSearch] = useState('');
+      const [sortBy, setSortBy] = useState('priority'); // 'priority' | 'impact' | 'newest' | 'ward'
+      const [viewMode, setViewMode] = useState('table'); // 'table' | 'kanban'
+      const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+      const [notifications, setNotifications] = useState([
+        { id: 1, text: 'CRITICAL ALERT: 11kV live wire Indiranagar escalated to P1.', time: '2m ago', unread: true },
+        { id: 2, text: 'AI Clustered: 6 similar pothole reports merged in Marathahalli.', time: '14m ago', unread: true },
+        { id: 3, text: 'Ticket CVX-1028 marked RESOLVED by BWSSB Field Unit.', time: '45m ago', unread: false }
+      ]);
+      const [showNotifications, setShowNotifications] = useState(false);
+
+      const triggerSound = (type) => {
+        if (soundEnabled) playHapticAudio(type);
+      };
+
+      // Keyboard shortcuts: Escape to close modals
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape') {
+            setShowTicketModal(false);
+            setShowXaiModal(false);
+            setShowCopilot(false);
+            setShowNotifications(false);
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, []);
+
+      useEffect(() => {
+        window.dispatchViewTicket = (id) => {
+          setSelectedTicketId(id);
+          setShowTicketModal(true);
+          triggerSound('click');
+        };
+      }, []);
+
+      const criticalEmergency = useMemo(() => {
+        return complaints.find(c => c.severity === 'Critical' && c.status !== 'RESOLVED');
+      }, [complaints]);
+
+      const stats = useMemo(() => {
+        const total = complaints.length;
+        const critical = complaints.filter(c => c.severity === 'Critical' && c.status !== 'RESOLVED').length;
+        const inProgress = complaints.filter(c => c.status === 'IN_PROGRESS' || c.status === 'DISPATCHED').length;
+        const resolved = complaints.filter(c => c.status === 'RESOLVED' || c.status === 'CITIZEN_VERIFIED').length;
+        return { total, critical, inProgress, resolved };
+      }, [complaints]);
+
+      const severityChartData = useMemo(() => {
+        const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+        complaints.forEach(c => {
+          counts[c.severity] = (counts[c.severity] || 0) + 1;
+        });
+        return [
+          { name: 'Critical', value: counts.Critical, color: '#EF4444' },
+          { name: 'High', value: counts.High, color: '#F59E0B' },
+          { name: 'Medium', value: counts.Medium, color: '#06B6D4' },
+          { name: 'Low', value: counts.Low, color: '#10B981' },
+        ];
+      }, [complaints]);
+
+      const hourlyVelocityData = [
+        { time: '02:00', complaints: 1, aiTriaged: 1 },
+        { time: '05:00', complaints: 3, aiTriaged: 3 },
+        { time: '08:00', complaints: 12, aiTriaged: 12 },
+        { time: '11:00', complaints: 18, aiTriaged: 17 },
+        { time: '14:00', complaints: 15, aiTriaged: 15 },
+        { time: '17:00', complaints: 22, aiTriaged: 22 },
+        { time: '20:00', complaints: 9, aiTriaged: 9 },
+      ];
+
+      const activeTicket = useMemo(() => {
+        return complaints.find(c => c.id === selectedTicketId) || complaints[0];
+      }, [complaints, selectedTicketId]);
+
+      const handleUpdateTicketStatus = (ticketId, newStatus) => {
+        setComplaints(prev => prev.map(t => {
+          if (t.id === ticketId) {
+            return { ...t, status: newStatus };
+          }
+          return t;
+        }));
+        triggerSound('success');
+      };
+
+      const handleEscalateTicket = (ticketId) => {
+        setComplaints(prev => prev.map(t => {
+          if (t.id === ticketId) {
+            const nextTier = (t.escalationTier || 1) + 1;
+            const history = t.escalationHistory || [];
+            return {
+              ...t,
+              escalationTier: nextTier,
+              escalationHistory: [
+                ...history,
+                { level: nextTier, to: nextTier === 2 ? 'Zonal Superintendent' : 'Municipal Commissioner & Disaster Cell', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), reason: 'Officer Manual Priority Escalation' }
+              ]
+            };
+          }
+          return t;
+        }));
+        triggerSound('alert');
+      };
+
+      const handleAddNewComplaint = (newTicket) => {
+        setComplaints(prev => [newTicket, ...prev]);
+        setSelectedTicketId(newTicket.id);
+        setActiveTab('explorer');
+        triggerSound('success');
+      };
+
+      // Reset Demo Data to pristine default state
+      const handleResetDemoData = () => {
+        if (window.confirm("Reset all tickets, statuses, and clusters back to pristine demo state?")) {
+          setComplaints(INITIAL_COMPLAINTS);
+          setClusters(INITIAL_DUPLICATE_CLUSTERS);
+          localStorage.removeItem('civiclens_complaints_v4');
+          localStorage.removeItem('civiclens_clusters_v2');
+          setSelectedTicketId(INITIAL_COMPLAINTS[0].id);
+          triggerSound('alert');
+        }
+      };
+
+      // Filtered and Sorted Complaints for Explorer
+      const processedComplaints = useMemo(() => {
+        let list = complaints.filter(c => {
+          if (!globalSearch) return true;
+          const q = globalSearch.toLowerCase();
+          return (
+            c.id.toLowerCase().includes(q) ||
+            c.title.toLowerCase().includes(q) ||
+            c.category.toLowerCase().includes(q) ||
+            c.severity.toLowerCase().includes(q) ||
+            c.ward.toLowerCase().includes(q) ||
+            c.status.toLowerCase().includes(q)
+          );
+        });
+
+        const severityRank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+
+        list.sort((a, b) => {
+          if (sortBy === 'priority') {
+            return (severityRank[b.severity] || 0) - (severityRank[a.severity] || 0);
+          } else if (sortBy === 'impact') {
+            return (b.impactScore || 0) - (a.impactScore || 0);
+          } else if (sortBy === 'ward') {
+            return a.ward.localeCompare(b.ward);
+          } else {
+            // Newest first
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          }
+        });
+
+        return list;
+      }, [complaints, globalSearch, sortBy]);
+
+      return (
+        <div className="min-h-screen bg-[#03060D] bg-grid-cyber flex flex-col text-slate-100 relative">
+          
+          {/* 1. TOP HEADER & EMERGENCY BROADCAST TICKER */}
+          <header className="sticky top-0 z-50 glass-card border-b border-slate-800/90 px-4 lg:px-6 py-2.5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {/* Mobile menu toggle */}
+              <button
+                onClick={() => setMobileNavOpen(!mobileNavOpen)}
+                className="lg:hidden p-2 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/60 text-slate-400 hover:text-white"
+                aria-label="Toggle navigation menu"
+              >
+                <Icon name="menu" size={18} />
+              </button>
+
+              <div className="flex items-center gap-3 cursor-pointer group" onClick={() => { setActiveTab('command'); triggerSound('click'); }}>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-violet-600 to-cyan-400 p-[1.5px] shadow-glow-cyan group-hover:scale-105 transition-transform">
+                  <div className="w-full h-full bg-[#050914] rounded-[10px] flex items-center justify-center">
+                    <Icon name="shield" size={22} className="text-cyan-400" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-black tracking-tight text-lg text-white">CIVIC<span className="gradient-text-cyan">LENS</span></h1>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/40">AI TRIAGE v2.6</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-mono hidden sm:block">MUNICIPAL INTELLIGENCE COMMAND OPERATING SYSTEM</p>
+                </div>
+              </div>
+            </div>
+
+            {criticalEmergency && (
+              <div 
+                className="hidden md:flex items-center gap-3 px-4 py-1.5 rounded-full bg-rose-500/15 border border-rose-500/50 cursor-pointer hover:bg-rose-500/25 transition shadow-glow-crimson group"
+                onClick={() => { setSelectedTicketId(criticalEmergency.id); setShowTicketModal(true); triggerSound('alert'); }}
+              >
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                </span>
+                <span className="text-xs font-bold text-rose-300 font-mono tracking-wide">
+                  CRITICAL P1 // {criticalEmergency.id}
+                </span>
+                <span className="text-slate-500">&bull;</span>
+                <div className="text-[11px] text-rose-200 font-mono flex items-center gap-1.5">
+                  <Icon name="clock" size={12} className="text-rose-400" />
+                  <span>SLA:</span>
+                  <SlaCountdownTimer initialHours={2} />
+                </div>
+                <span className="text-[10px] bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full shadow group-hover:scale-105 transition">ACTION &rarr;</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleResetDemoData}
+                title="Reset All Demo Data to Defaults"
+                className="p-2 rounded-xl border border-slate-800 hover:border-amber-500/40 bg-slate-900/60 text-slate-400 hover:text-amber-400 transition"
+              >
+                <Icon name="refresh" size={16} />
+              </button>
+
+              <button
+                onClick={() => { setSoundEnabled(!soundEnabled); triggerSound('click'); }}
+                title={soundEnabled ? "Audio Haptics Enabled" : "Muted"}
+                className={`p-2 rounded-xl border transition ${soundEnabled ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-400 shadow-glow-cyan-sm' : 'border-slate-800 text-slate-500 hover:text-slate-300'}`}
+              >
+                <Icon name={soundEnabled ? "speaker" : "mute"} size={16} />
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => { setShowNotifications(!showNotifications); triggerSound('click'); }}
+                  className="p-2 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/60 text-slate-300 hover:text-white transition relative"
+                >
+                  <Icon name="bell" size={16} />
+                  {notifications.some(n => n.unread) && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 glass-card rounded-2xl p-3 border border-slate-700 shadow-2xl z-50 animate-fadeIn">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-300 font-mono">Civic Alert Stream</span>
+                      <button 
+                        onClick={() => setNotifications(prev => prev.map(n => ({...n, unread: false})))}
+                        className="text-[10px] text-cyan-400 hover:underline"
+                      >
+                        Mark all read
+                      </button>
+                    </div>
+                    <div className="divide-y divide-slate-800/80 max-h-64 overflow-y-auto mt-1">
+                      {notifications.map(n => (
+                        <div key={n.id} className="py-2.5 px-1.5 text-xs hover:bg-slate-800/40 rounded transition">
+                          <p className={`text-xs ${n.unread ? 'font-semibold text-white' : 'text-slate-400'}`}>{n.text}</p>
+                          <span className="text-[10px] text-slate-500">{n.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => { setShowCopilot(true); triggerSound('scan'); }}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-medium text-xs shadow-glow-cyan transition"
+              >
+                <Icon name="sparkles" size={15} />
+                <span className="hidden sm:inline">AI Copilot</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('submit'); triggerSound('click'); }}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/50 hover:bg-emerald-500/25 text-emerald-300 font-semibold text-xs transition shadow-glow-emerald"
+              >
+                <Icon name="plus" size={15} />
+                <span>Report Issue</span>
+              </button>
+            </div>
+          </header>
+
+          {/* 2. MAIN WORKSPACE WITH SIDEBAR NAVIGATION */}
+          <div className="flex-1 flex overflow-hidden">
+            <aside className={`fixed inset-y-0 left-0 z-40 w-60 border-r border-slate-800/80 glass-card flex flex-col justify-between p-3 select-none transition-transform duration-300 lg:static lg:translate-x-0 ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+              <nav className="space-y-1.5 pt-12 lg:pt-0">
+                {[
+                  { id: 'command', label: 'Command Center', icon: 'activity', badge: 'LIVE' },
+                  { id: 'explorer', label: 'Triage Queue', icon: 'layers', count: complaints.length },
+                  { id: 'clusters', label: 'Duplicate Hub', icon: 'copy', count: clusters.length },
+                  { id: 'departments', label: 'Department Analytics', icon: 'trendingUp' },
+                  { id: 'map', label: 'Geospatial Map', icon: 'mapPin' },
+                  { id: 'submit', label: 'Citizen Portal', icon: 'camera', highlight: true },
+                  { id: 'tracker', label: 'Ticket Tracker', icon: 'search' },
+                  { id: 'predictive', label: 'Predictive & XAI', icon: 'cpu' },
+                ].map(item => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setMobileNavOpen(false);
+                        triggerSound('click');
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${
+                        isActive
+                          ? 'bg-gradient-to-r from-cyan-500/25 to-violet-500/15 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan-sm'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
+                      }`}
+                    >
+                      <Icon name={item.icon} size={18} className={isActive ? 'text-cyan-400' : 'text-slate-400'} />
+                      <span>{item.label}</span>
+                      {item.badge && (
+                        <span className="ml-auto text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.count !== undefined && (
+                        <span className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                          {item.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="glass-card p-3.5 rounded-xl border border-slate-800/90 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span>DISPATCH SYSTEM</span>
+                  <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    ONLINE
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-400 leading-relaxed">
+                  Autonomous AI routing active across PWD, SWM, BWSSB & DISCOM.
+                </div>
+              </div>
+            </aside>
+
+            {/* Right Main Content Stage */}
+            <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 animate-fadeIn">
+              
+              {/* TAB 1: COMMAND CENTER */}
+              {activeTab === 'command' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                        <span>Municipal Command Matrix</span>
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono">REAL-TIME TELEMETRY</span>
+                      </h2>
+                      <p className="text-xs text-slate-400">Automated classification, computer vision hazard scoring, duplicate clustering, and dynamic SLA routing.</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { setActiveTab('submit'); triggerSound('click'); }}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-xs shadow-glow-cyan flex items-center gap-2 transition"
+                      >
+                        <Icon name="plus" size={15} />
+                        <span>Simulate New Report</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 4 Animated KPI Metric Cards */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="glass-card glass-card-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                      <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                        <span>TOTAL INGESTION</span>
+                        <Icon name="layers" size={16} className="text-cyan-400" />
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-white font-mono">
+                          <AnimatedCounter target={stats.total} />
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold">+18% today</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-slate-400">100% processed by AI pipeline</div>
+                      <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-cyan-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    </div>
+
+                    <div className="glass-card glass-card-hover p-4 rounded-2xl border border-rose-500/40 relative overflow-hidden bg-rose-950/15 shadow-glow-crimson">
+                      <div className="flex items-center justify-between text-rose-300 text-xs font-mono">
+                        <span>CRITICAL EMERGENCIES</span>
+                        <Icon name="alert" size={16} className="text-rose-400" />
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-rose-400 font-mono">
+                          <AnimatedCounter target={stats.critical} />
+                        </span>
+                        <span className="text-[11px] text-rose-300 font-semibold">Immediate Dispatch</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-rose-300/80">Average SLA Target: 2.0 Hours</div>
+                      <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-rose-500/20 rounded-full blur-xl pointer-events-none"></div>
+                    </div>
+
+                    <div className="glass-card glass-card-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                      <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                        <span>FIELD CREWS ACTIVE</span>
+                        <Icon name="activity" size={16} className="text-amber-400" />
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-white font-mono">
+                          <AnimatedCounter target={stats.inProgress} />
+                        </span>
+                        <span className="text-[11px] text-amber-400 font-semibold">En route / Active</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-slate-400">94.2% on-schedule dispatch</div>
+                      <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    </div>
+
+                    <div className="glass-card glass-card-hover p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                      <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                        <span>RESOLVED & VERIFIED</span>
+                        <Icon name="check" size={16} className="text-emerald-400" />
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-emerald-400 font-mono">
+                          <AnimatedCounter target={stats.resolved} />
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold">Citizen Verified</span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-slate-400">Average resolution: 4.8 hours</div>
+                      <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    </div>
+                  </div>
+
+                  <CivicAiInsightsPanel triggerSound={triggerSound} />
+
+                  {/* Middle Row: Visual Charts + Severity Donut */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="glass-card p-5 rounded-2xl border border-slate-800/80 lg:col-span-2 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                            <Icon name="trendingUp" size={16} className="text-cyan-400" />
+                            <span>24-Hour Complaint Velocity & AI Triage Rate</span>
+                          </h3>
+                          <p className="text-[11px] text-slate-400">Incoming citizen grievances vs autonomous machine-triaged work orders</p>
+                        </div>
+                        <span className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">99.2% AUTONOMOUS</span>
+                      </div>
+                      
+                      <div className="h-64 w-full pt-2">
+                        {window.Recharts && (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={hourlyVelocityData}>
+                              <defs>
+                                <linearGradient id="colorComplaints" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.45}/>
+                                  <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.0}/>
+                                </linearGradient>
+                                <linearGradient id="colorAI" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.45}/>
+                                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.0}/>
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#14213d" vertical={false} />
+                              <XAxis dataKey="time" stroke="#64748B" fontSize={11} tickLine={false} />
+                              <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                              <Tooltip 
+                                contentStyle={{ backgroundColor: '#0A1224', borderColor: '#1E293B', borderRadius: '12px', fontSize: '11px', color: '#fff', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
+                              />
+                              <Area type="monotone" dataKey="complaints" stroke="#06B6D4" strokeWidth={2.5} fillOpacity={1} fill="url(#colorComplaints)" name="Incoming Complaints" />
+                              <Area type="monotone" dataKey="aiTriaged" stroke="#8B5CF6" strokeWidth={2.5} strokeDasharray="3 3" fillOpacity={1} fill="url(#colorAI)" name="AI Auto-Triaged" />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="glass-card p-5 rounded-2xl border border-slate-800/80 space-y-3 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                          <Icon name="shield" size={16} className="text-violet-400" />
+                          <span>Severity Profile</span>
+                        </h3>
+                        <span className="text-[11px] text-slate-400 font-mono">Weighted Risk</span>
+                      </div>
+
+                      <div className="h-44 w-full">
+                        {window.Recharts && (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={severityChartData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={44}
+                                outerRadius={70}
+                                paddingAngle={5}
+                                dataKey="value"
+                              >
+                                {severityChartData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip contentStyle={{ backgroundColor: '#0A1224', borderColor: '#1E293B', borderRadius: '8px', fontSize: '11px' }} />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">
+                        {severityChartData.map(item => (
+                          <div key={item.name} className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
+                            <span className="text-slate-300">{item.name}</span>
+                            <span className="font-mono text-slate-400 font-bold ml-auto">{item.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Row: Map + Activity Timeline */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="glass-card p-4 rounded-2xl border border-slate-800/80 lg:col-span-2 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                            <Icon name="mapPin" size={16} className="text-emerald-400" />
+                            <span>Metropolitan Civic Hotspot Map</span>
+                          </h3>
+                          <p className="text-[11px] text-slate-400">Interactive geospatial telemetry with multi-tier sonar beacons</p>
+                        </div>
+                        <button
+                          onClick={() => { setActiveTab('map'); triggerSound('click'); }}
+                          className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+                        >
+                          <span>Full Map View</span>
+                          <Icon name="chevronRight" size={14} />
+                        </button>
+                      </div>
+
+                      <div className="h-80 w-full rounded-xl overflow-hidden">
+                        <CityIncidentMap
+                          complaints={complaints}
+                          selectedId={selectedTicketId}
+                          onSelectTicket={(id) => {
+                            setSelectedTicketId(id);
+                            setShowTicketModal(true);
+                            triggerSound('click');
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <LiveActivityTimeline
+                      complaints={complaints}
+                      onSelectTicket={(id) => {
+                        setSelectedTicketId(id);
+                        setShowTicketModal(true);
+                      }}
+                      triggerSound={triggerSound}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: TRIAGE QUEUE & EXPLORER (With Sorting & Kanban Toggle) */}
+              {activeTab === 'explorer' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                        <span>Municipal Triage Queue</span>
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-400">
+                          {processedComplaints.length} of {complaints.length} INCIDENTS
+                        </span>
+                      </h2>
+                      <p className="text-xs text-slate-400">Search, filter by severity, sort by priority or impact, and switch between Table and Kanban views.</p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Search Input */}
+                      <div className="relative">
+                        <Icon name="search" size={16} className="absolute left-3 top-2.5 text-slate-400" />
+                        <input
+                          type="text"
+                          value={globalSearch}
+                          onChange={(e) => setGlobalSearch(e.target.value)}
+                          placeholder="Search keyword, ward, ticket ID..."
+                          className="bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 w-52 sm:w-64"
+                        />
+                        {globalSearch && (
+                          <button
+                            onClick={() => setGlobalSearch('')}
+                            className="absolute right-2.5 top-2.5 text-slate-500 hover:text-white"
+                          >
+                            <Icon name="x" size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Sort Dropdown */}
+                      <select
+                        value={sortBy}
+                        onChange={(e) => { setSortBy(e.target.value); triggerSound('click'); }}
+                        className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      >
+                        <option value="priority">Sort: Severity (High → Low)</option>
+                        <option value="impact">Sort: Citizen Impact (High → Low)</option>
+                        <option value="newest">Sort: Date (Newest First)</option>
+                        <option value="ward">Sort: Ward Alphabetical</option>
+                      </select>
+
+                      {/* View Mode Toggle (Table / Kanban) */}
+                      <div className="flex items-center p-0.5 rounded-xl bg-slate-900 border border-slate-800">
+                        <button
+                          onClick={() => { setViewMode('table'); triggerSound('click'); }}
+                          className={`p-1.5 rounded-lg transition ${viewMode === 'table' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}`}
+                          title="Table View"
+                        >
+                          <Icon name="table" size={16} />
+                        </button>
+                        <button
+                          onClick={() => { setViewMode('kanban'); triggerSound('click'); }}
+                          className={`p-1.5 rounded-lg transition ${viewMode === 'kanban' ? 'bg-cyan-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'}`}
+                          title="Kanban Board View"
+                        >
+                          <Icon name="kanban" size={16} />
+                        </button>
+                      </div>
+
+                      {/* CSV Export */}
+                      <button
+                        onClick={() => {
+                          const csv = "ID,Category,Severity,Department,Ward,Status,ImpactScore\n" + 
+                            processedComplaints.map(c => `"${c.id}","${c.category}","${c.severity}","${c.department}","${c.ward}","${c.status}",${c.impactScore}`).join("\n");
+                          const blob = new Blob([csv], { type: 'text/csv' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `CivicLens_Dispatch_${Date.now()}.csv`;
+                          a.click();
+                          triggerSound('success');
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition"
+                      >
+                        <Icon name="download" size={14} />
+                        <span className="hidden sm:inline">Export CSV</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                    <span className="text-slate-400 font-mono text-[11px] mr-1">QUICK FILTER:</span>
+                    {['ALL', 'Critical', 'High', 'Medium', 'IN_PROGRESS', 'DISPATCHED', 'RESOLVED'].map(filterKey => (
+                      <button
+                        key={filterKey}
+                        onClick={() => {
+                          setGlobalSearch(filterKey === 'ALL' ? '' : filterKey);
+                          triggerSound('click');
+                        }}
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition ${
+                          globalSearch === filterKey || (filterKey === 'ALL' && globalSearch === '')
+                            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-glow-cyan-sm'
+                            : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {filterKey}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Empty State when zero search results */}
+                  {processedComplaints.length === 0 ? (
+                    <div className="glass-card p-12 rounded-2xl border border-slate-800 text-center space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-500 mx-auto">
+                        <Icon name="search" size={24} />
+                      </div>
+                      <h3 className="text-base font-bold text-white">No Municipal Tickets Found</h3>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                        No complaints match your query "{globalSearch}". Try adjusting your search term or clearing the active filter.
+                      </p>
+                      <button
+                        onClick={() => setGlobalSearch('')}
+                        className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition"
+                      >
+                        Reset All Filters
+                      </button>
+                    </div>
+                  ) : viewMode === 'table' ? (
+                    /* Table View */
+                    <div className="glass-card rounded-2xl border border-slate-800/80 overflow-hidden shadow-2xl">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-900/90 text-slate-400 uppercase font-mono text-[10px] tracking-wider border-b border-slate-800">
+                            <tr>
+                              <th className="py-3 px-4">Ticket ID</th>
+                              <th className="py-3 px-4">Complaint & Hazard</th>
+                              <th className="py-3 px-4">Category</th>
+                              <th className="py-3 px-4">Severity & SLA</th>
+                              <th className="py-3 px-4">Escalation</th>
+                              <th className="py-3 px-4">Routed Department</th>
+                              <th className="py-3 px-4">Impact Score</th>
+                              <th className="py-3 px-4">Status</th>
+                              <th className="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60">
+                            {processedComplaints.map(ticket => {
+                              const sev = SEVERITY_CONFIG[ticket.severity] || SEVERITY_CONFIG.Medium;
+                              return (
+                                <tr 
+                                  key={ticket.id}
+                                  className="hover:bg-slate-800/40 transition cursor-pointer group"
+                                  onClick={() => { setSelectedTicketId(ticket.id); setShowTicketModal(true); triggerSound('click'); }}
+                                >
+                                  <td className="py-3.5 px-4 font-mono font-bold text-cyan-400 whitespace-nowrap">
+                                    {ticket.id}
+                                    {ticket.duplicatesCount > 0 && (
+                                      <span className="ml-1.5 px-1 py-0.2 rounded bg-violet-500/20 text-violet-300 text-[9px] border border-violet-500/30">
+                                        +{ticket.duplicatesCount} merged
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="py-3.5 px-4 max-w-xs">
+                                    <p className="font-semibold text-white group-hover:text-cyan-300 transition line-clamp-1">{ticket.title}</p>
+                                    <p className="text-[11px] text-slate-400 line-clamp-1">{ticket.ward}</p>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap text-slate-300">
+                                    {ticket.category}
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${sev.badge}`}>
+                                      {ticket.severity}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                                      ticket.escalationTier === 3 ? 'bg-laserRed/20 text-rose-300 border border-laserRed/40 animate-pulse' :
+                                      ticket.escalationTier === 2 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                                      'bg-slate-800 text-slate-400'
+                                    }`}>
+                                      TIER {ticket.escalationTier || 1}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 max-w-[180px] text-slate-300 truncate">
+                                    {ticket.department}
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-14 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                        <div
+                                          className={`h-full rounded-full ${ticket.impactScore > 80 ? 'bg-rose-500' : ticket.impactScore > 60 ? 'bg-amber-400' : 'bg-cyan-400'}`}
+                                          style={{ width: `${ticket.impactScore}%` }}
+                                        ></div>
+                                      </div>
+                                      <span className="font-mono font-bold text-white text-[11px]">{ticket.impactScore}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-4 whitespace-nowrap">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                                      ticket.status === 'RESOLVED' || ticket.status === 'CITIZEN_VERIFIED'
+                                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                        : ticket.status === 'IN_PROGRESS'
+                                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                        : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                                    }`}>
+                                      {ticket.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                    <button
+                                      onClick={() => { setSelectedTicketId(ticket.id); setShowXaiModal(true); triggerSound('scan'); }}
+                                      className="px-2.5 py-1 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-300 hover:bg-violet-500/25 text-[11px] font-medium mr-2"
+                                    >
+                                      XAI
+                                    </button>
+                                    <button
+                                      onClick={() => { setSelectedTicketId(ticket.id); setShowTicketModal(true); triggerSound('click'); }}
+                                      className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-[11px] font-semibold"
+                                    >
+                                      Inspect
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Kanban Board View */
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                      {['AI_TRIAGED', 'DISPATCHED', 'IN_PROGRESS', 'RESOLVED'].map(colStatus => {
+                        const colTickets = processedComplaints.filter(c => c.status === colStatus);
+                        return (
+                          <div key={colStatus} className="glass-card p-4 rounded-2xl border border-slate-800 flex flex-col space-y-3">
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                              <span className="font-mono text-xs font-bold text-white">{colStatus}</span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-400 font-bold">
+                                {colTickets.length}
+                              </span>
+                            </div>
+
+                            <div className="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1">
+                              {colTickets.map(ticket => {
+                                const sev = SEVERITY_CONFIG[ticket.severity] || SEVERITY_CONFIG.Medium;
+                                return (
+                                  <div
+                                    key={ticket.id}
+                                    onClick={() => { setSelectedTicketId(ticket.id); setShowTicketModal(true); triggerSound('click'); }}
+                                    className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition space-y-2 group shadow"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-mono text-[11px] font-bold text-cyan-400">{ticket.id}</span>
+                                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${sev.badge}`}>
+                                        {ticket.severity}
+                                      </span>
+                                    </div>
+                                    <p className="font-semibold text-xs text-white group-hover:text-cyan-300 transition line-clamp-2">
+                                      {ticket.title}
+                                    </p>
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                                      <span>{ticket.ward.split('-')[0]}</span>
+                                      <span className="text-cyan-300">Impact: {ticket.impactScore}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 3: DUPLICATE CLUSTER HUB (Feature 2) */}
+              {activeTab === 'clusters' && (
+                <DuplicateClusterHub
+                  clusters={clusters}
+                  complaints={complaints}
+                  onSelectTicket={(id) => {
+                    setSelectedTicketId(id);
+                    setShowTicketModal(true);
+                  }}
+                  triggerSound={triggerSound}
+                />
+              )}
+
+              {/* TAB 4: DEPARTMENT PERFORMANCE ANALYTICS (Feature 10) */}
+              {activeTab === 'departments' && (
+                <DepartmentPerformanceView triggerSound={triggerSound} />
+              )}
+
+              {/* TAB 5: GEOSPATIAL MAP VIEW */}
+              {activeTab === 'map' && (
+                <div className="space-y-4 h-[calc(100vh-140px)] flex flex-col">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-black text-white flex items-center gap-2">
+                        <Icon name="mapPin" size={20} className="text-cyan-400" />
+                        <span>Interactive City Geospatial Command</span>
+                      </h2>
+                      <p className="text-xs text-slate-400">Pulsing telemetry markers denote severity, cluster nodes, and live field operations.</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-slate-400 font-mono text-[11px]">ACTIVE WARD CLUSTERS: 12</span>
+                      <button
+                        onClick={() => {
+                          setGlobalSearch('Critical');
+                          triggerSound('click');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold"
+                      >
+                        Highlight Critical Hotspots
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+                    <CityIncidentMap
+                      complaints={complaints}
+                      selectedId={selectedTicketId}
+                      onSelectTicket={(id) => {
+                        setSelectedTicketId(id);
+                        setShowTicketModal(true);
+                        triggerSound('click');
+                      }}
+                      zoom={13}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 6: CITIZEN REPORTING PORTAL */}
+              {activeTab === 'submit' && (
+                <CitizenSubmissionView
+                  onComplaintSubmitted={handleAddNewComplaint}
+                  triggerSound={triggerSound}
+                  onCancel={() => setActiveTab('command')}
+                />
+              )}
+
+              {/* TAB 7: PUBLIC CITIZEN TICKET TRACKER */}
+              {activeTab === 'tracker' && (
+                <PublicTicketTrackerView
+                  complaints={complaints}
+                  triggerSound={triggerSound}
+                  onSelectTicket={(id) => { setSelectedTicketId(id); setShowTicketModal(true); }}
+                />
+              )}
+
+              {/* TAB 8: PREDICTIVE HOTSPOTS & EXPLAINABLE AI */}
+              {activeTab === 'predictive' && (
+                <PredictiveAnalyticsView
+                  complaints={complaints}
+                  triggerSound={triggerSound}
+                  onInspectTicket={(id) => { setSelectedTicketId(id); setShowXaiModal(true); }}
+                />
+              )}
+
+            </main>
+          </div>
+
+          {/* 3. TICKET INSPECTION & RESOLUTION SOP MODAL */}
+          {showTicketModal && activeTicket && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+              <div className="glass-card w-full max-w-4xl rounded-2xl border border-slate-700 p-6 space-y-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+                <div className="flex items-start justify-between border-b border-slate-800 pb-4">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-base font-extrabold text-cyan-400">{activeTicket.id}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${SEVERITY_CONFIG[activeTicket.severity]?.badge}`}>
+                        {activeTicket.severity}
+                      </span>
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                        {activeTicket.category}
+                      </span>
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        ESCALATION TIER {activeTicket.escalationTier || 1}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-bold text-white mt-1">{activeTicket.title}</h2>
+                    <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+                      <Icon name="mapPin" size={13} className="text-cyan-400" />
+                      <span>{activeTicket.address}</span>
+                      <span className="text-slate-500">&bull;</span>
+                      <span className="font-mono text-cyan-300">{activeTicket.ward}</span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setShowTicketModal(false); triggerSound('click'); }}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                  >
+                    <Icon name="x" size={18} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Left Column: Image with Defect Bounding Boxes */}
+                  <div className="space-y-4">
+                    <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-900 group">
+                      <img
+                        src={activeTicket.image}
+                        alt="Civic Issue"
+                        className="w-full h-56 object-cover"
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80';
+                        }}
+                      />
+                      {activeTicket.xai?.cvDetections?.map((box, idx) => (
+                        <div
+                          key={idx}
+                          className="absolute border-2 border-dashed rounded pointer-events-none transition-all duration-300"
+                          style={{
+                            borderColor: box.color || '#06B6D4',
+                            left: `${box.box[0]}%`,
+                            top: `${box.box[1]}%`,
+                            width: `${box.box[2]}%`,
+                            height: `${box.box[3]}%`,
+                            backgroundColor: 'rgba(6, 182, 212, 0.15)'
+                          }}
+                        >
+                          <span
+                            className="absolute -top-5 left-0 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold text-white shadow-md whitespace-nowrap"
+                            style={{ backgroundColor: box.color || '#06B6D4' }}
+                          >
+                            {box.label} ({Math.round(box.conf * 100)}%)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Citizen Impact Breakdown (Feature 4) */}
+                    <div className="glass-card p-4 rounded-xl border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>AI CITIZEN IMPACT INDEX</span>
+                        <Icon name="users" size={15} className="text-cyan-400" />
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black text-cyan-400 font-mono">{activeTicket.impactScore}</span>
+                        <span className="text-xs text-slate-400">/ 100 Impact</span>
+                      </div>
+                      <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-cyan-400 to-violet-500 h-full rounded-full"
+                          style={{ width: `${activeTicket.impactScore}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        Estimated affected population: <span className="text-white font-semibold">{activeTicket.impactPopulation?.toLocaleString()} residents</span>
+                      </p>
+                    </div>
+
+                    {/* Smart Escalation Panel (Feature 5) */}
+                    <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/40 text-xs space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                          <Icon name="alert" size={14} />
+                          <span>Smart Escalation Matrix</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-amber-400 font-bold">TIER {activeTicket.escalationTier || 1}</span>
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        Priority threshold automatically escalates ticket when unresolved or recurring.
+                      </p>
+                      <button
+                        onClick={() => handleEscalateTicket(activeTicket.id)}
+                        className="w-full py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition"
+                      >
+                        ⚡ Escalate to Tier {(activeTicket.escalationTier || 1) + 1}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Middle & Right: Multilingual Brief + Resolution SOP (Feature 6 & 7) */}
+                  <div className="md:col-span-2 space-y-4">
+                    {/* Multilingual View */}
+                    <div className="glass-card p-4 rounded-xl border border-slate-800 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                          <Icon name="globe" size={14} className="text-cyan-400" />
+                          <span>Original Submission ({activeTicket.citizenLanguage || 'Regional'})</span>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">Citizen: {activeTicket.citizenName}</span>
+                      </div>
+                      <p className="text-xs text-slate-300 italic bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 leading-relaxed">
+                        "{activeTicket.originalText}"
+                      </p>
+
+                      <div className="pt-2">
+                        <span className="text-xs font-bold text-cyan-300 uppercase tracking-wider font-mono">Municipal Standardized Dispatch Brief</span>
+                        <p className="text-xs text-slate-200 mt-1 leading-relaxed bg-cyan-950/20 border border-cyan-500/20 p-3 rounded-lg">
+                          {activeTicket.summary}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Resolution Intelligence SOP (Feature 6) */}
+                    <div className="glass-card p-4 rounded-xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+                          <Icon name="tool" size={15} className="text-amber-400" />
+                          <span>AI Resolution Intelligence & Field SOP</span>
+                        </h4>
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">AUTONOMOUS SOP</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 font-mono block">ASSIGNED CREW SPEC</span>
+                          <span className="font-semibold text-slate-200 text-[11px]">{activeTicket.fieldRecommendation?.crew || 'Rapid Action Unit (3 Techs)'}</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 font-mono block">REQUIRED HEAVY EQUIPMENT</span>
+                          <span className="font-semibold text-slate-200 text-[11px]">{activeTicket.fieldRecommendation?.equipment || 'Standard Field Toolkit'}</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 font-mono block">ESTIMATED RESOLUTION TIME</span>
+                          <span className="font-semibold text-cyan-400 text-[11px]">{activeTicket.fieldRecommendation?.estHours || 2.5} Hours Target</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                          <span className="text-[10px] text-slate-400 font-mono block">BUDGET ALLOCATION (EST.)</span>
+                          <span className="font-semibold text-emerald-400 text-[11px]">{activeTicket.fieldRecommendation?.costEstimate || '₹12,000'}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <strong className="text-white">Bill of Materials:</strong>
+                          <span className="text-cyan-300 font-mono">{activeTicket.fieldRecommendation?.materials || 'Standard municipal replenishment pack'}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          <strong className="text-white block mb-1">Field Safety Checklist:</strong>
+                          <ul className="list-disc pl-4 space-y-0.5">
+                            {activeTicket.fieldRecommendation?.checklist?.map((chk, i) => (
+                              <li key={i}>{chk}</li>
+                            )) || <li>Perimeter safety cones deployed</li>}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Update Actions */}
+                    <div className="glass-card p-4 rounded-xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 font-mono">DISPATCH STATUS:</span>
+                        <span className="font-mono font-bold text-white px-2 py-0.5 bg-slate-800 rounded">{activeTicket.status}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        {['AI_TRIAGED', 'DISPATCHED', 'IN_PROGRESS', 'RESOLVED'].map(st => (
+                          <button
+                            key={st}
+                            onClick={() => handleUpdateTicketStatus(activeTicket.id, st)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                              activeTicket.status === st
+                                ? 'bg-cyan-500 text-slate-950 shadow-glow-cyan'
+                                : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                            }`}
+                          >
+                            Mark {st}
+                          </button>
+                        ))}
+
+                        <button
+                          onClick={() => { setShowXaiModal(true); triggerSound('scan'); }}
+                          className="ml-auto px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-glow-violet"
+                        >
+                          <Icon name="cpu" size={14} />
+                          <span>Explain AI Triage (XAI)</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 4. EXPLAINABLE AI (XAI) DEEP-DIVE MODAL (Feature 9) */}
+          {showXaiModal && activeTicket && (
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+              <div className="glass-card w-full max-w-3xl rounded-2xl border border-violet-500/40 p-6 space-y-6 shadow-glow-violet max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-violet-500/20 border border-violet-500/40 flex items-center justify-center text-violet-400">
+                      <Icon name="cpu" size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                        <span>Explainable AI (XAI) Audit Matrix</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">TRANSPARENT AI</span>
+                      </h3>
+                      <p className="text-xs text-slate-400">Model interpretability and feature importance for {activeTicket.id}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setShowXaiModal(false); triggerSound('click'); }}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+                  >
+                    <Icon name="x" size={18} />
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white">Why Category: {activeTicket.category}?</span>
+                      <span className="font-mono text-cyan-400 font-bold">{activeTicket.xai?.confidence || 96.5}% Model Confidence</span>
+                    </div>
+                    <p className="text-slate-300 text-xs leading-relaxed">
+                      Zero-shot classifier evaluated semantic embeddings against 7 municipal taxonomy vectors. Primary NLP triggers identified:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {activeTicket.xai?.primaryTriggers?.map((trig, i) => (
+                        <span key={i} className="px-2 py-1 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-mono text-[11px]">
+                          "{trig}"
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white">Why Severity: {activeTicket.severity}?</span>
+                      <span className="font-mono text-rose-400 font-bold">Risk Assessment Weight: 0.94</span>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">
+                      {activeTicket.xai?.hazardReason || activeTicket.hazardReason}
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+                    <span className="font-bold text-white">Department Dispatch Rationale</span>
+                    <p className="text-slate-300 leading-relaxed">
+                      {activeTicket.xai?.routingReason || 'Routed based on Municipal Act Jurisdiction & Asset Type Ownership.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2 border-t border-slate-800">
+                  <button
+                    onClick={() => { setShowXaiModal(false); triggerSound('click'); }}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs"
+                  >
+                    Close Audit Log
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 5. AI CIVIC COPILOT SLIDE-OVER DRAWER (Feature 1) */}
+          {showCopilot && (
+            <CivicCopilotDrawer
+              complaints={complaints}
+              onClose={() => setShowCopilot(false)}
+              onSelectTicket={(id) => {
+                setSelectedTicketId(id);
+                setShowTicketModal(true);
+                setShowCopilot(false);
+              }}
+              triggerSound={triggerSound}
+            />
+          )}
+
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 12. CITIZEN SUBMISSION VIEW (MULTILINGUAL + AI SCANNER)
+    // ========================================================
+    const CitizenSubmissionView = ({ onComplaintSubmitted, triggerSound, onCancel }) => {
+      const [text, setText] = useState('');
+      const [address, setAddress] = useState('Indiranagar 100ft Road, Bangalore');
+      const [lat, setLat] = useState(12.9784);
+      const [lng, setLng] = useState(77.6408);
+      const [citizenName, setCitizenName] = useState('Ananya Sharma');
+      const [citizenPhone, setCitizenPhone] = useState('+91 98450-23491');
+      const [selectedLang, setSelectedLang] = useState('en');
+      const [previewImage, setPreviewImage] = useState('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=600&q=80');
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [analysisStep, setAnalysisStep] = useState(0);
+      const [formError, setFormError] = useState('');
+
+      const handlePickScenario = (scen) => {
+        setText(scen.text);
+        setAddress(scen.address);
+        setLat(scen.lat);
+        setLng(scen.lng);
+        setPreviewImage(scen.image);
+        setFormError('');
+        triggerSound('click');
+      };
+
+      const handleImageUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            setPreviewImage(reader.result);
+            triggerSound('click');
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const handleSubmit = () => {
+        if (!text.trim() || text.trim().length < 5) {
+          setFormError('Please enter at least 5 characters describing the civic grievance.');
+          triggerSound('alert');
+          return;
+        }
+
+        setFormError('');
+        setIsAnalyzing(true);
+        triggerSound('scan');
+
+        setTimeout(() => setAnalysisStep(1), 500);
+        setTimeout(() => setAnalysisStep(2), 1100);
+        setTimeout(() => setAnalysisStep(3), 1700);
+        setTimeout(() => {
+          setIsAnalyzing(false);
+          setAnalysisStep(0);
+
+          const aiResult = analyzeComplaintWithAI(text, address, previewImage);
+          const newId = `CVX-2026-${Math.floor(1050 + Math.random() * 8900)}`;
+
+          const newTicket = {
+            id: newId,
+            title: text.slice(0, 65) + (text.length > 65 ? '...' : ''),
+            category: aiResult.category,
+            categoryId: aiResult.categoryId,
+            severity: aiResult.severity,
+            department: aiResult.department,
+            ward: 'Ward 112 - Central Division',
+            address: address,
+            lat: lat,
+            lng: lng,
+            status: 'AI_TRIAGED',
+            impactScore: aiResult.impactScore,
+            impactPopulation: aiResult.impactPopulation,
+            createdAt: new Date().toISOString(),
+            citizenName: citizenName || 'Verified Citizen',
+            citizenPhone: citizenPhone || '+91 9XXXX-XXXXX',
+            citizenLanguage: REGIONAL_LANGUAGES.find(l => l.code === selectedLang)?.name || 'English',
+            originalText: text,
+            summary: aiResult.summary,
+            escalationTier: 1,
+            escalationHistory: [{ level: 1, to: aiResult.department, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), reason: 'Citizen Ingestion' }],
+            xai: {
+              confidence: aiResult.confidence,
+              primaryTriggers: aiResult.triggers,
+              hazardLevel: aiResult.hazardReason,
+              routingReason: `Automatically routed to ${aiResult.department} under SLA ${aiResult.slaHours}h.`,
+              cvDetections: aiResult.cvDetections
+            },
+            fieldRecommendation: {
+              crew: `${aiResult.department} Unit`,
+              equipment: 'Standard municipal toolkit & safety barricades',
+              materials: 'Consumable repair supplies',
+              checklist: ['Perimeter cones placed', 'Standard procedure adhered'],
+              estHours: aiResult.slaHours / 2,
+              costEstimate: '₹8,500'
+            },
+            duplicatesCount: 0,
+            clusterId: null,
+            isEmergency: aiResult.severity === 'Critical',
+            image: previewImage
+          };
+
+          onComplaintSubmitted(newTicket);
+        }, 2400);
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <span>Citizen Smart Complaint Submission</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">MULTILINGUAL AI</span>
+              </h2>
+              <p className="text-xs text-slate-400">File a municipal grievance with text in any Indian regional language and photos.</p>
+            </div>
+            <button
+              onClick={onCancel}
+              className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div className="glass-card p-4 rounded-2xl border border-slate-800 space-y-2">
+            <span className="text-[11px] font-mono text-cyan-400 font-bold block">1-CLICK DEMO SCENARIOS:</span>
+            <div className="flex flex-wrap gap-2">
+              {DEMO_SCENARIOS.map((scen, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handlePickScenario(scen)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-xs text-left transition flex items-center gap-2 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 group-hover:scale-125 transition"></span>
+                  <span className="font-semibold text-slate-200">{scen.name}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">({scen.lang})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 glass-card p-6 rounded-2xl border border-slate-800">
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-mono text-slate-400 block mb-1.5">PREFERRED LANGUAGE (REGIONAL TRANSLATION)</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {REGIONAL_LANGUAGES.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => { setSelectedLang(lang.code); triggerSound('click'); }}
+                      className={`py-1.5 px-2 rounded-lg text-xs font-medium text-center transition ${
+                        selectedLang === lang.code
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan'
+                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span className="block font-bold">{lang.native}</span>
+                      <span className="text-[9px] text-slate-500">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-mono text-slate-400">DESCRIBE CIVIC GRIEVANCE</label>
+                  <span className="text-[10px] font-mono text-slate-500">{text.length} characters</span>
+                </div>
+                <textarea
+                  rows={5}
+                  value={text}
+                  onChange={(e) => { setText(e.target.value); if (formError) setFormError(''); }}
+                  placeholder="e.g. Electric pole leaning dangerously or huge pothole causing accidents near school..."
+                  className={`w-full bg-slate-900/90 border rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none leading-relaxed transition ${
+                    formError ? 'border-rose-500/70 focus:border-rose-400' : 'border-slate-700 focus:border-cyan-400'
+                  }`}
+                />
+                {formError && (
+                  <p className="text-[11px] text-rose-400 mt-1 flex items-center gap-1 font-medium">
+                    <Icon name="alert" size={13} />
+                    <span>{formError}</span>
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="text-[10px] font-mono text-slate-400 block mb-1">CITIZEN NAME</label>
+                  <input
+                    type="text"
+                    value={citizenName}
+                    onChange={(e) => setCitizenName(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-slate-400 block mb-1">PHONE NUMBER</label>
+                  <input
+                    type="text"
+                    value={citizenPhone}
+                    onChange={(e) => setCitizenPhone(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-mono text-slate-400 block mb-1.5">PHOTO EVIDENCE (COMPUTER VISION SCAN)</label>
+                <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-900 h-44 flex items-center justify-center group">
+                  {previewImage ? (
+                    <img src={previewImage} alt="Upload Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-4">
+                      <Icon name="upload" size={24} className="mx-auto text-slate-500 mb-2" />
+                      <p className="text-xs text-slate-400">Drag & drop civic photo here</p>
+                    </div>
+                  )}
+                  <label className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-black/70 hover:bg-black/90 backdrop-blur border border-slate-600 text-[11px] text-white cursor-pointer transition flex items-center gap-1.5">
+                    <Icon name="camera" size={13} />
+                    <span>Upload Image</span>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-mono text-slate-400 block mb-1.5">LOCATION / LANDMARK</label>
+                <div className="flex items-center gap-2">
+                  <Icon name="mapPin" size={16} className="text-cyan-400" />
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={isAnalyzing}
+                className={`w-full py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition ${
+                  isAnalyzing
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white shadow-glow-cyan'
+                }`}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Icon name="refresh" size={16} className="animate-spin" />
+                    <span>
+                      {analysisStep === 1 && "Running NLP Multilingual Translation..."}
+                      {analysisStep === 2 && "Scanning Image Computer Vision Bounding Boxes..."}
+                      {analysisStep === 3 && "Assessing Severity Matrix & SLA Routing..."}
+                      {analysisStep === 0 && "Initializing AI Triage Engine..."}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Icon name="sparkles" size={16} />
+                    <span>Launch AI Classification & Triage</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 13. PUBLIC TICKET TRACKER VIEW (CITIZEN PORTAL)
+    // ========================================================
+    const PublicTicketTrackerView = ({ complaints, triggerSound, onSelectTicket }) => {
+      const [searchQuery, setSearchQuery] = useState('CVX-2026-1042');
+      const [matchedTicket, setMatchedTicket] = useState(complaints[0] || null);
+      const [citizenRating, setCitizenRating] = useState(5);
+      const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+      const handleSearch = (idToSearch) => {
+        const q = idToSearch || searchQuery;
+        triggerSound('click');
+        const found = complaints.find(c => c.id.toLowerCase() === q.trim().toLowerCase());
+        setMatchedTicket(found || null);
+        setFeedbackSubmitted(false);
+      };
+
+      return (
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-black text-white">Public Citizen Ticket Tracker</h2>
+            <p className="text-xs text-slate-400">Track resolution progress, field crew SLA deadlines, and submit verification.</p>
+          </div>
+
+          <div className="glass-card p-3 rounded-2xl border border-slate-800 flex items-center gap-2">
+            <Icon name="search" size={18} className="text-cyan-400 ml-2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Enter Ticket ID (e.g. CVX-2026-1042)..."
+              className="flex-1 bg-transparent border-none text-white text-sm font-mono focus:outline-none"
+            />
+            <button
+              onClick={() => handleSearch()}
+              className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition"
+            >
+              Track Ticket
+            </button>
+          </div>
+
+          {matchedTicket ? (
+            <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-6 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div>
+                  <div className="flex items-center gap-2 font-mono text-cyan-400 font-bold text-base">
+                    <span>{matchedTicket.id}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${SEVERITY_CONFIG[matchedTicket.severity]?.badge}`}>
+                      {matchedTicket.severity}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-white mt-1">{matchedTicket.title}</h3>
+                  <p className="text-xs text-slate-400">{matchedTicket.address}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-slate-400 block">STATUS</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-bold text-xs border border-emerald-500/40">
+                    {matchedTicket.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[11px] font-mono text-slate-400">RESOLUTION TIMELINE</span>
+                <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                  {[
+                    { step: '1. Ingestion', status: 'COMPLETED' },
+                    { step: '2. AI Triage', status: 'COMPLETED' },
+                    { step: '3. Field Dispatch', status: matchedTicket.status === 'AI_TRIAGED' ? 'PENDING' : 'COMPLETED' },
+                    { step: '4. Resolution', status: matchedTicket.status === 'RESOLVED' || matchedTicket.status === 'CITIZEN_VERIFIED' ? 'COMPLETED' : 'IN_PROGRESS' },
+                  ].map((s, idx) => (
+                    <div key={idx} className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
+                      <span className="font-semibold text-white text-[11px] block">{s.step}</span>
+                      <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded ${
+                        s.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300'
+                      }`}>
+                        {s.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2 text-xs">
+                <span className="font-bold text-white block">Official Dispatch Brief</span>
+                <p className="text-slate-300 leading-relaxed">{matchedTicket.summary}</p>
+                <div className="pt-1 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Assigned Unit: <strong className="text-white">{matchedTicket.department}</strong></span>
+                  <span>Impact Score: <strong className="text-cyan-400 font-mono">{matchedTicket.impactScore}/100</strong></span>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/30 space-y-3 text-xs">
+                <span className="font-bold text-white block">Citizen Verification & Satisfaction Rating</span>
+                {feedbackSubmitted ? (
+                  <div className="text-emerald-400 font-bold text-center py-2">
+                    ✓ Thank you! Citizen feedback recorded into Municipal Transparency Ledger.
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button
+                          key={star}
+                          onClick={() => { setCitizenRating(star); triggerSound('click'); }}
+                          className={`p-1 text-lg transition ${star <= citizenRating ? 'text-amber-400' : 'text-slate-600'}`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                      <span className="text-xs text-slate-300 ml-2">({citizenRating} / 5 Stars)</span>
+                    </div>
+                    <button
+                      onClick={() => { setFeedbackSubmitted(true); triggerSound('success'); }}
+                      className="px-3.5 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs"
+                    >
+                      Submit Verification
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="glass-card p-8 rounded-2xl border border-slate-800 text-center space-y-4">
+              <p className="text-slate-400 text-xs">No ticket found with ID "{searchQuery}".</p>
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono text-cyan-400 block">TRY TRACKING SAMPLE INCIDENTS:</span>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {complaints.slice(0, 3).map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => { setSearchQuery(c.id); handleSearch(c.id); }}
+                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-mono text-xs"
+                    >
+                      {c.id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 14. PREDICTIVE HOTSPOTS & WARD ANALYTICS VIEW (Feature 3)
+    // ========================================================
+    const PredictiveAnalyticsView = ({ complaints, triggerSound, onInspectTicket }) => {
+      const wardRankings = [
+        { ward: 'Ward 112 - Indiranagar', riskIndex: 92, openIssues: 4, primaryRisk: 'Overhead Electrical Cables & Monsoon Storm Trees' },
+        { ward: 'Ward 150 - Koramangala', riskIndex: 88, openIssues: 3, primaryRisk: 'Stormwater Drain Inundation & Sewage Overflow' },
+        { ward: 'Ward 142 - Silk Board', riskIndex: 85, openIssues: 5, primaryRisk: 'Arterial Traffic Gridlock & Unregulated Transit' },
+        { ward: 'Ward 85 - Marathahalli', riskIndex: 79, openIssues: 4, primaryRisk: 'Underpass Asphalt Sub-base Delamination' },
+        { ward: 'Ward 174 - Bellandur', riskIndex: 76, openIssues: 2, primaryRisk: 'Wetland Buffer Chemical Sludge & Solid Waste' },
+      ];
+
+      return (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-black text-white flex items-center gap-2">
+              <span>Predictive Civic Hotspots & Ward Vulnerability</span>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/40">NEURAL PREDICTION</span>
+            </h2>
+            <p className="text-xs text-slate-400">Algorithmic risk forecasting to prevent municipal infrastructure failure before citizen escalation.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                <h3 className="font-bold text-sm text-white">Ward Vulnerability Index (WVI)</h3>
+                <span className="text-[10px] font-mono text-cyan-400">UPDATED HOURLY</span>
+              </div>
+
+              <div className="space-y-3">
+                {wardRankings.map((ward, idx) => (
+                  <div key={idx} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-white">{ward.ward}</span>
+                      <span className="font-mono text-rose-400 font-bold">{ward.riskIndex}/100 Risk</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-amber-400 to-rose-500 h-full rounded-full"
+                        style={{ width: `${ward.riskIndex}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-[11px] text-slate-400">{ward.primaryRisk}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                <h3 className="font-bold text-sm text-white">Predictive Infrastructure Alerts</h3>
+                <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">PREVENTATIVE</span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-1.5">
+                  <div className="flex items-center gap-2 text-amber-300 font-bold">
+                    <Icon name="alert" size={15} />
+                    <span>Monsoon Flood Warning: Koramangala 4th Block</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed text-[11px]">
+                    Recurrence anomaly: 4 separate drain blockages logged within 500m of Sony World Signal. Predicted 85% probability of major road inundation if unaddressed before upcoming rain forecast.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-violet-950/20 border border-violet-500/30 space-y-1.5">
+                  <div className="flex items-center gap-2 text-violet-300 font-bold">
+                    <Icon name="zap" size={15} />
+                    <span>Feeder Overload Risk: Indiranagar Substation</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed text-[11px]">
+                    Voltage fluctuations detected across 3 residential blocks. Recommend preemptive transformer oil inspection by DISCOM crews before peak evening grid draw.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 15. AI CIVIC COPILOT CONVERSATIONAL DRAWER (Feature 1)
+    // ========================================================
+    const CivicCopilotDrawer = ({ complaints, onClose, onSelectTicket, triggerSound }) => {
+      const [messages, setMessages] = useState([
+        {
+          id: 1,
+          sender: 'ai',
+          text: 'Hello, Commander. I am your **CivicLens AI Municipal Copilot**. I have analyzed all active municipal telemetry, geospatial clusters, and department field allocations. How can I assist your dispatch operations today?'
+        }
+      ]);
+      const [input, setInput] = useState('');
+      const [isThinking, setIsThinking] = useState(false);
+
+      const quickPrompts = [
+        "🚨 What are the top critical emergencies right now?",
+        "📊 Which department has the worst backlog?",
+        "⚡ Draft dispatch order for live wire in Indiranagar",
+        "🔍 Find duplicate clusters in Koramangala",
+        "⚠️ Which tickets require immediate escalation?"
+      ];
+
+      const handleSendMessage = (textToSend) => {
+        const query = textToSend || input;
+        if (!query.trim()) return;
+
+        triggerSound('click');
+        const userMsg = { id: Date.now(), sender: 'user', text: query };
+        setMessages(prev => [...prev, userMsg]);
+        setInput('');
+        setIsThinking(true);
+
+        setTimeout(() => {
+          setIsThinking(false);
+          triggerSound('scan');
+
+          let reply = "";
+          const q = query.toLowerCase();
+
+          if (q.includes('critical') || q.includes('emergency')) {
+            const crits = complaints.filter(c => c.severity === 'Critical');
+            reply = `Currently, there are **${crits.length} Critical Emergencies** requiring immediate action:\n\n` +
+              crits.map(c => `• **${c.id}**: ${c.title} (${c.ward}) - SLA: 2h [Tier ${c.escalationTier || 1}]`).join('\n') +
+              `\n\nWould you like me to initiate immediate emergency crew mobilization?`;
+          } else if (q.includes('backlog') || q.includes('department')) {
+            reply = `**Department Performance & Backlog Analysis**:\n• **PWD**: 14 active backlog tickets (78.4% SLA compliance - Grade B)\n• **SWD (Drainage)**: 11 active backlog tickets (74.0% SLA compliance - Grade C+)\n• **DISCOM**: 8 active backlog tickets (92.1% SLA compliance - Grade A)\n• **SWM**: 7 active backlog tickets (95.2% SLA compliance - Grade A+)\n\n**Recommendation**: SWD and PWD are the primary operational bottlenecks due to seasonal monsoon road degradation.`;
+          } else if (q.includes('escalat')) {
+            reply = `**Smart Escalation Candidate Identified**:\n• **CVX-2026-1042** (Indiranagar Live Wire): Approaching SLA deadline with 800 school students in 40m proximity.\n• Recommended Action: Escalate immediately to Tier 2 (Zonal Superintendent). Click the ticket to trigger automated alert.`;
+          } else if (q.includes('live wire') || q.includes('indiranagar')) {
+            reply = `**Dispatch Brief Draft for CVX-2026-1042**:\n• **Assigned Unit**: DISCOM Emergency Feeder Unit\n• **Hazard**: 11kV live power cable severed across school pedestrian gate\n• **Required Action**: Immediate remote breaker trip on Feeder Line 4B, followed by 4-man lineman rewiring team.\n• **Required Materials**: Copper Splice Clamps, HT Insulation Sleeve\n• **SLA Target**: Under 90 minutes.`;
+          } else if (q.includes('duplicate') || q.includes('cluster')) {
+            reply = `**Incident Cluster Diagnosis**:\n• Identified **3 Major Active Clusters** encompassing 18 citizen reports.\n• Largest cluster is at **Marathahalli Underpass** (6 duplicate reports, ~35,000 citizens impacted).\n• Consolidated master ticket: **CVX-2026-1035**.`;
+          } else {
+            reply = `I have cross-referenced your query against the live municipal database. All active complaints are continuously triaged using multimodal NLP, computer vision bounding boxes, and SLA escalation rules. You can switch to the **Duplicate Hub** or **Department Analytics** tabs to explore deeper.`;
+          }
+
+          setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'ai', text: reply }]);
+        }, 800);
+      };
+
+      return (
+        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-card border-l border-slate-700 p-4 flex flex-col shadow-2xl animate-fadeIn">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-600 flex items-center justify-center text-white shadow-glow-cyan">
+                <Icon name="bot" size={18} />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">AI Civic Copilot</h3>
+                <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  CONNECTED TO MUNICIPAL BRAIN
+                </span>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+              <Icon name="x" size={18} />
+            </button>
+          </div>
+
+          <div className="py-2.5 flex flex-wrap gap-1.5 border-b border-slate-800">
+            {quickPrompts.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => handleSendMessage(p)}
+                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-left transition"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1 overflow-y-auto py-3 space-y-3">
+            {messages.map(m => (
+              <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                  m.sender === 'user'
+                    ? 'bg-cyan-600 text-white rounded-br-none shadow-glow-cyan'
+                    : 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-bl-none'
+                }`}>
+                  <div dangerouslySetInnerHTML={{ __html: m.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} />
+                </div>
+              </div>
+            ))}
+            {isThinking && (
+              <div className="flex justify-start">
+                <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 text-xs flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                  <span>Copilot analyzing municipal matrix...</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-slate-800 flex items-center gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Ask Copilot about any ticket, ward, or SOP..."
+              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400"
+            />
+            <button
+              onClick={() => handleSendMessage()}
+              className="p-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition font-bold"
+            >
+              <Icon name="send" size={16} />
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    // ========================================================
+    // 16. AMBIENT CANVAS PARTICLES WITH VISIBILITY PAUSE
+    // ========================================================
+    const initAmbientParticles = () => {
+      const canvas = document.getElementById('ambient-cyber-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particleCount = 42;
+      const particles = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          size: Math.random() * 1.8 + 0.8,
+          alpha: Math.random() * 0.5 + 0.2
+        });
+      }
+
+      let animId = null;
+
+      const render = () => {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < particleCount; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(6, 182, 212, ${p.alpha})`;
+          ctx.fill();
+
+          for (let j = i + 1; j < particleCount; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 110) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(56, 189, 248, ${(1 - dist / 110) * 0.12})`;
+              ctx.lineWidth = 0.7;
+              ctx.stroke();
+            }
+          }
+        }
+
+        animId = requestAnimationFrame(render);
+      };
+
+      // Pause when tab hidden to save battery & CPU
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (animId) cancelAnimationFrame(animId);
+        } else {
+          animId = requestAnimationFrame(render);
+        }
+      });
+
+      render();
+    };
+
+    setTimeout(initAmbientParticles, 100);
+    const rootElement = document.getElementById('root');
+    ReactDOM.createRoot(rootElement).render(<CivicLensApp />);
+  </script>
+</body>
+</html>

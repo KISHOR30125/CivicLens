@@ -1,0 +1,23 @@
+{
+  "name": "civiclens-ai-triage",
+  "version": "1.0.0",
+  "description": "CivicLens - AI Triage for Citizen Complaints & Municipal Intelligence Command Center",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "civic-tech",
+    "ai-triage",
+    "municipal-intelligence",
+    "smart-city",
+    "react",
+    "tailwind",
+    "leaflet",
+    "computer-vision",
+    "multilingual-nlp"
+  ],
+  "author": "Google DeepMind / Antigravity AI Prototype",
+  "license": "MIT"
+}
